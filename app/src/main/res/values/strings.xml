@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">LCB_Template</string>
+    <string name="action_my_location">回到当前位置</string>
+    <string name="action_map_type">切换地图类型</string>
+    <string name="action_zoom_in">放大</string>
+    <string name="action_zoom_out">缩小</string>
+    <string name="search_hint">搜索地点、街景</string>
+    <string name="location_permission_rationale">需要定位权限才能在地图上显示你的当前位置</string>
+    <string name="location_permission_denied">未授予定位权限，无法显示当前位置</string>
+    <string name="location_unavailable">暂时无法获取当前位置，请确认已开启定位服务</string>
+    <string name="street_view_searching">正在搜索附近街景…</string>
+    <string name="street_view_found">找到 %1$d 个附近街景点</string>
+    <string name="street_view_none">附近暂未发现街景</string>
+    <string name="street_view_error">街景搜索失败，请稍后再试</string>
+    <string name="street_view_marker_title">街景点</string>
+    <string name="street_view_nearby_idle">定位后将显示附近街景</string>
+    <string name="tab_hot">热门街景</string>
+    <string name="tab_nearby">附近街景</string>
+    <string name="sv_loading">街景加载中…</string>
+    <string name="sv_error">街景加载失败，请检查网络后重试</string>
+    <string name="sv_retry">重新加载</string>
+    <string name="sv_back">返回</string>
+    <string name="sv_open_external_failed">无法打开外部链接</string>
+</resources>

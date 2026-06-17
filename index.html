@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>街景校验台</title>
+    <meta
+      name="description"
+      content="使用 Google Maps Embed API 与 Street View metadata API 的轻量街景校验产品原型。"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #22312d;
+        --muted: #68756f;
+        --line: #d8e2dc;
+        --panel: #f7faf7;
+        --paper: #fffdf8;
+        --field: #ffffff;
+        --green: #147a50;
+        --green-soft: #dff3e8;
+        --red: #a43a2f;
+        --red-soft: #f8e3de;
+        --amber: #9a6716;
+        --amber-soft: #f7ebcf;
+        --blue: #265f8f;
+        --blue-soft: #e1edf6;
+        --shadow: 0 24px 70px rgba(40, 57, 49, 0.16);
+        --radius: 8px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background:
+          linear-gradient(90deg, rgba(34, 49, 45, 0.035) 1px, transparent 1px),
+          linear-gradient(rgba(34, 49, 45, 0.035) 1px, transparent 1px),
+          var(--paper);
+        background-size: 44px 44px;
+        color: var(--ink);
+        letter-spacing: 0;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.62;
+      }
+
+      .app {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+      }
+
+      .sidebar {
+        background: rgba(247, 250, 247, 0.94);
+        border-right: 1px solid var(--line);
+        padding: clamp(18px, 3vw, 32px);
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        overflow: auto;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(25px, 4vw, 38px);
+        line-height: 0.98;
+        font-weight: 780;
+        max-width: 6em;
+      }
+
+      .api-pill {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 7px 10px;
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.62);
+      }
+
+      .panel {
+        display: grid;
+        gap: 13px;
+      }
+
+      .section-title {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 750;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      label {
+        display: grid;
+        gap: 7px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--field);
+        color: var(--ink);
+        outline: none;
+        padding: 11px 12px;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: color-mix(in srgb, var(--green), var(--line) 35%);
+        box-shadow: 0 0 0 4px rgba(20, 122, 80, 0.13);
+      }
+
+      textarea {
+        min-height: 82px;
+        resize: vertical;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .slider-row {
+        display: grid;
+        grid-template-columns: 72px minmax(0, 1fr) 58px;
+        gap: 9px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      input[type="range"] {
+        accent-color: var(--green);
+        padding: 0;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .button {
+        min-height: 42px;
+        border-radius: var(--radius);
+        color: var(--ink);
+        background: #e9eee9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 720;
+      }
+
+      .button.primary {
+        background: var(--green);
+        color: white;
+      }
+
+      .button.ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+      }
+
+      .button.icon {
+        width: 42px;
+        min-height: 38px;
+        padding: 0;
+      }
+
+      .mini-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+      }
+
+      .preset {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.7);
+        min-height: 36px;
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 650;
+      }
+
+      .viewer-area {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+      }
+
+      .topbar {
+        min-height: 68px;
+        padding: 14px clamp(18px, 3vw, 34px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid rgba(216, 226, 220, 0.72);
+        background: rgba(255, 253, 248, 0.78);
+        backdrop-filter: blur(12px);
+      }
+
+      .status {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+      }
+
+      .dot {
+        width: 11px;
+        height: 11px;
+        flex: 0 0 auto;
+        border-radius: 999px;
+        background: var(--amber);
+        box-shadow: 0 0 0 5px var(--amber-soft);
+      }
+
+      .dot.ok {
+        background: var(--green);
+        box-shadow: 0 0 0 5px var(--green-soft);
+      }
+
+      .dot.bad {
+        background: var(--red);
+        box-shadow: 0 0 0 5px var(--red-soft);
+      }
+
+      .status-text {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 9px;
+        flex: 0 0 auto;
+      }
+
+      .stage {
+        position: relative;
+        min-height: 0;
+        overflow: hidden;
+        background:
+          linear-gradient(135deg, rgba(20, 122, 80, 0.08), transparent 45%),
+          #e8eee9;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-height: calc(100vh - 68px);
+        border: 0;
+        background: #dfe7e2;
+      }
+
+      .empty-state {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .empty-inner {
+        width: min(580px, 100%);
+        padding: clamp(22px, 4vw, 40px);
+        border: 1px solid rgba(216, 226, 220, 0.9);
+        border-radius: 12px;
+        background: rgba(255, 253, 248, 0.82);
+        box-shadow: var(--shadow);
+      }
+
+      .empty-inner h2 {
+        margin: 0 0 11px;
+        font-size: clamp(28px, 5vw, 56px);
+        line-height: 0.96;
+        max-width: 8em;
+      }
+
+      .empty-inner p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.6;
+        max-width: 38em;
+      }
+
+      .metadata {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .meta-item {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.62);
+        padding: 10px;
+        min-width: 0;
+      }
+
+      .meta-label {
+        color: var(--muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        font-weight: 750;
+      }
+
+      .meta-value {
+        margin-top: 5px;
+        font-size: 13px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .place-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.62);
+        padding: 8px;
+      }
+
+      .place-main {
+        min-width: 0;
+      }
+
+      .place-name {
+        font-size: 13px;
+        font-weight: 720;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .place-sub {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .toast {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        max-width: min(360px, calc(100vw - 36px));
+        border-radius: var(--radius);
+        background: var(--ink);
+        color: white;
+        padding: 12px 14px;
+        box-shadow: var(--shadow);
+        font-size: 13px;
+        transform: translateY(16px);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 160ms ease, opacity 160ms ease;
+      }
+
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+          max-height: none;
+        }
+
+        .viewer-area {
+          min-height: 58vh;
+        }
+
+        iframe {
+          min-height: 58vh;
+        }
+
+        .topbar {
+          position: sticky;
+          top: 0;
+          z-index: 2;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .row,
+        .actions,
+        .metadata {
+          grid-template-columns: 1fr;
+        }
+
+        .brand,
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .top-actions {
+          width: 100%;
+        }
+
+        .top-actions .button {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <aside class="sidebar" aria-label="街景查询控制台">
+        <header class="brand">
+          <h1>街景校验台</h1>
+          <span class="api-pill">Embed + Metadata</span>
+        </header>
+
+        <section class="panel" aria-labelledby="api-title">
+          <div class="section-title" id="api-title">API Key</div>
+          <label>
+            Google Maps API Key
+            <input id="apiKey" type="password" autocomplete="off" placeholder="粘贴你的 API key" />
+          </label>
+          <button class="button ghost" id="saveKey" type="button">保存到本机</button>
+        </section>
+
+        <section class="panel" aria-labelledby="lookup-title">
+          <div class="section-title" id="lookup-title">位置</div>
+          <label>
+            坐标、地址或 Google Maps 链接
+            <textarea id="locationInput" spellcheck="false">40.457375,-80.009353</textarea>
+          </label>
+          <div class="row">
+            <label>
+              纬度
+              <input id="latInput" inputmode="decimal" placeholder="40.457375" />
+            </label>
+            <label>
+              经度
+              <input id="lngInput" inputmode="decimal" placeholder="-80.009353" />
+            </label>
+          </div>
+          <div class="actions">
+            <button class="button primary" id="checkBtn" type="button">校验并打开</button>
+            <button class="button" id="nearbyBtn" type="button">附近探测</button>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="camera-title">
+          <div class="section-title" id="camera-title">视角</div>
+          <div class="slider-row">
+            <span>方向</span>
+            <input id="heading" type="range" min="-180" max="360" value="210" />
+            <output id="headingValue">210°</output>
+          </div>
+          <div class="slider-row">
+            <span>俯仰</span>
+            <input id="pitch" type="range" min="-90" max="90" value="0" />
+            <output id="pitchValue">0°</output>
+          </div>
+          <div class="slider-row">
+            <span>视野</span>
+            <input id="fov" type="range" min="10" max="100" value="70" />
+            <output id="fovValue">70°</output>
+          </div>
+          <div class="mini-grid" aria-label="快速方向">
+            <button class="preset" data-heading="0" type="button">北</button>
+            <button class="preset" data-heading="90" type="button">东</button>
+            <button class="preset" data-heading="180" type="button">南</button>
+            <button class="preset" data-heading="270" type="button">西</button>
+            <button class="preset" data-heading="210" type="button">默认</button>
+            <button class="preset" id="randomHeading" type="button">随机</button>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="metadata-title">
+          <div class="section-title" id="metadata-title">街景元数据</div>
+          <div class="metadata">
+            <div class="meta-item">
+              <div class="meta-label">状态</div>
+              <div class="meta-value" id="metaStatus">未校验</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">拍摄日期</div>
+              <div class="meta-value" id="metaDate">-</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">实际坐标</div>
+              <div class="meta-value" id="metaLocation">-</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Pano ID</div>
+              <div class="meta-value" id="metaPano">-</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="nearby-title">
+          <div class="section-title" id="nearby-title">附近可用街景</div>
+          <div class="list" id="nearbyList"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="saved-title">
+          <div class="section-title" id="saved-title">历史与收藏</div>
+          <div class="actions">
+            <button class="button" id="favoriteBtn" type="button">收藏当前</button>
+            <button class="button ghost" id="clearBtn" type="button">清空记录</button>
+          </div>
+          <div class="list" id="savedList"></div>
+        </section>
+      </aside>
+
+      <section class="viewer-area" aria-label="街景查看器">
+        <div class="topbar">
+          <div class="status">
+            <span class="dot" id="statusDot" aria-hidden="true"></span>
+            <span class="status-text" id="statusText">输入 API key 和坐标后先校验街景，再加载 Embed 街景。</span>
+          </div>
+          <div class="top-actions">
+            <button class="button ghost" id="copyLink" type="button">复制链接</button>
+            <button class="button ghost" id="copyEmbed" type="button">复制 iframe</button>
+          </div>
+        </div>
+        <div class="stage">
+          <iframe id="streetFrame" title="Google Street View" referrerpolicy="no-referrer-when-downgrade" allowfullscreen loading="lazy"></iframe>
+          <div class="empty-state" id="emptyState">
+            <div class="empty-inner">
+              <h2>先确认，再进入街景。</h2>
+              <p>
+                Metadata 校验能在加载街景前判断该点是否存在全景，并返回最近全景的实际坐标、拍摄日期与 pano_id。
+                校验成功后再把 pano_id 交给 Maps Embed API，能减少空白街景和错误位置。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      const els = {
+        apiKey: document.querySelector("#apiKey"),
+        saveKey: document.querySelector("#saveKey"),
+        locationInput: document.querySelector("#locationInput"),
+        latInput: document.querySelector("#latInput"),
+        lngInput: document.querySelector("#lngInput"),
+        checkBtn: document.querySelector("#checkBtn"),
+        nearbyBtn: document.querySelector("#nearbyBtn"),
+        heading: document.querySelector("#heading"),
+        pitch: document.querySelector("#pitch"),
+        fov: document.querySelector("#fov"),
+        headingValue: document.querySelector("#headingValue"),
+        pitchValue: document.querySelector("#pitchValue"),
+        fovValue: document.querySelector("#fovValue"),
+        metaStatus: document.querySelector("#metaStatus"),
+        metaDate: document.querySelector("#metaDate"),
+        metaLocation: document.querySelector("#metaLocation"),
+        metaPano: document.querySelector("#metaPano"),
+        nearbyList: document.querySelector("#nearbyList"),
+        favoriteBtn: document.querySelector("#favoriteBtn"),
+        clearBtn: document.querySelector("#clearBtn"),
+        savedList: document.querySelector("#savedList"),
+        statusDot: document.querySelector("#statusDot"),
+        statusText: document.querySelector("#statusText"),
+        streetFrame: document.querySelector("#streetFrame"),
+        emptyState: document.querySelector("#emptyState"),
+        copyLink: document.querySelector("#copyLink"),
+        copyEmbed: document.querySelector("#copyEmbed"),
+        toast: document.querySelector("#toast"),
+      };
+
+      const state = {
+        lastMetadata: null,
+        lastEmbedUrl: "",
+        currentLocation: null,
+        saved: loadJson("streetview:saved", []),
+      };
+
+      function loadJson(key, fallback) {
+        try {
+          return JSON.parse(localStorage.getItem(key)) ?? fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function setJson(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function toast(message) {
+        els.toast.textContent = message;
+        els.toast.classList.add("show");
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => els.toast.classList.remove("show"), 2300);
+      }
+
+      function setStatus(kind, message) {
+        els.statusDot.className = `dot ${kind === "ok" ? "ok" : kind === "bad" ? "bad" : ""}`;
+        els.statusText.textContent = message;
+      }
+
+      function parseLocation(raw) {
+        const text = raw.trim();
+        if (!text) throw new Error("请输入坐标、地址或 Google Maps 链接。");
+
+        const atMatch = text.match(/@(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/);
+        const pairMatch = text.match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+        const queryMatch = text.match(/[?&](?:q|query|ll)=(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/);
+        const match = atMatch || queryMatch || pairMatch;
+
+        if (match) {
+          const lat = Number(match[1]);
+          const lng = Number(match[2]);
+          if (!Number.isFinite(lat) || lat < -90 || lat > 90) throw new Error("纬度必须在 -90 到 90 之间。");
+          if (!Number.isFinite(lng) || lng < -180 || lng > 180) throw new Error("经度必须在 -180 到 180 之间。");
+          return { type: "coordinates", lat, lng, label: `${lat.toFixed(6)},${lng.toFixed(6)}` };
+        }
+
+        return { type: "address", query: text, label: text };
+      }
+
+      function syncCoordinateFields(location) {
+        if (location.type === "coordinates") {
+          els.latInput.value = location.lat.toFixed(6);
+          els.lngInput.value = location.lng.toFixed(6);
+        }
+      }
+
+      function readLocationFromFields() {
+        const lat = Number(els.latInput.value);
+        const lng = Number(els.lngInput.value);
+        if (els.latInput.value && els.lngInput.value && Number.isFinite(lat) && Number.isFinite(lng)) {
+          return parseLocation(`${lat},${lng}`);
+        }
+        return parseLocation(els.locationInput.value);
+      }
+
+      function metadataUrl(location) {
+        const params = new URLSearchParams({ key: els.apiKey.value.trim() });
+        if (location.type === "coordinates") {
+          params.set("location", `${location.lat},${location.lng}`);
+        } else {
+          params.set("location", location.query);
+        }
+        return `https://maps.googleapis.com/maps/api/streetview/metadata?${params.toString()}`;
+      }
+
+      function embedUrl(location, metadata = null) {
+        const params = new URLSearchParams({
+          key: els.apiKey.value.trim(),
+          heading: els.heading.value,
+          pitch: els.pitch.value,
+          fov: els.fov.value,
+        });
+
+        const pano = metadata?.pano_id;
+        if (pano) {
+          params.set("pano", pano);
+        } else if (location.type === "coordinates") {
+          params.set("location", `${location.lat},${location.lng}`);
+        } else {
+          params.set("location", location.query);
+        }
+
+        return `https://www.google.com/maps/embed/v1/streetview?${params.toString()}`;
+      }
+
+      async function checkStreetView({ load = true, location = null, quiet = false } = {}) {
+        if (!els.apiKey.value.trim()) throw new Error("请先填写 Google Maps API key。");
+
+        const target = location || readLocationFromFields();
+        syncCoordinateFields(target);
+        state.currentLocation = target;
+        setStatus("pending", "正在请求 Street View metadata...");
+        els.checkBtn.disabled = true;
+        els.nearbyBtn.disabled = true;
+
+        try {
+          const res = await fetch(metadataUrl(target));
+          if (!res.ok) throw new Error(`metadata 请求失败：HTTP ${res.status}`);
+          const data = await res.json();
+          renderMetadata(data);
+
+          if (data.status !== "OK") {
+            const message = statusMessage(data.status, data.error_message);
+            setStatus("bad", message);
+            if (!quiet) toast(message);
+            return data;
+          }
+
+          state.lastMetadata = data;
+          if (load) loadEmbed(target, data);
+          addHistory(target, data);
+          setStatus("ok", `已找到街景：${formatLatLng(data.location)}${data.date ? `，拍摄于 ${data.date}` : ""}`);
+          return data;
+        } finally {
+          els.checkBtn.disabled = false;
+          els.nearbyBtn.disabled = false;
+        }
+      }
+
+      function statusMessage(status, detail = "") {
+        const map = {
+          ZERO_RESULTS: "该位置附近没有可用街景。",
+          NOT_FOUND: "指定 pano_id 不存在或已失效。",
+          REQUEST_DENIED: "请求被拒绝，请检查 API key、API 启用状态、来源限制和 billing。",
+          OVER_QUERY_LIMIT: "请求达到限制，请稍后再试或检查项目配额。",
+          INVALID_REQUEST: "请求缺少必要参数。",
+          UNKNOWN_ERROR: "Google 服务暂时异常，请稍后重试。",
+        };
+        return detail || map[status] || `metadata 返回 ${status}`;
+      }
+
+      function loadEmbed(location, metadata = null) {
+        const url = embedUrl(location, metadata);
+        state.lastEmbedUrl = url;
+        els.streetFrame.src = url;
+        els.emptyState.hidden = true;
+        updateUrlState(location);
+      }
+
+      function renderMetadata(data) {
+        els.metaStatus.textContent = data.status || "-";
+        els.metaDate.textContent = data.date || "-";
+        els.metaLocation.textContent = formatLatLng(data.location) || "-";
+        els.metaPano.textContent = data.pano_id || "-";
+      }
+
+      function formatLatLng(location) {
+        if (!location) return "";
+        return `${Number(location.lat).toFixed(6)}, ${Number(location.lng).toFixed(6)}`;
+      }
+
+      function addHistory(location, metadata) {
+        const item = {
+          id: `${Date.now()}`,
+          kind: "history",
+          label: location.label,
+          lat: metadata.location?.lat ?? location.lat,
+          lng: metadata.location?.lng ?? location.lng,
+          pano: metadata.pano_id,
+          date: metadata.date || "",
+        };
+        state.saved = [item, ...state.saved.filter((entry) => entry.pano !== item.pano)].slice(0, 12);
+        setJson("streetview:saved", state.saved);
+        renderSaved();
+      }
+
+      function favoriteCurrent() {
+        if (!state.lastMetadata?.pano_id) {
+          toast("先校验并打开一个可用街景。");
+          return;
+        }
+        const item = {
+          id: `fav-${state.lastMetadata.pano_id}`,
+          kind: "favorite",
+          label: state.currentLocation?.label || formatLatLng(state.lastMetadata.location),
+          lat: state.lastMetadata.location.lat,
+          lng: state.lastMetadata.location.lng,
+          pano: state.lastMetadata.pano_id,
+          date: state.lastMetadata.date || "",
+        };
+        state.saved = [item, ...state.saved.filter((entry) => entry.id !== item.id && entry.pano !== item.pano)];
+        setJson("streetview:saved", state.saved);
+        renderSaved();
+        toast("已收藏当前街景。");
+      }
+
+      function renderSaved() {
+        els.savedList.innerHTML = "";
+        if (!state.saved.length) {
+          els.savedList.append(emptyListText("暂无记录"));
+          return;
+        }
+        for (const item of state.saved) {
+          els.savedList.append(placeRow(item, "打开", () => openSaved(item)));
+        }
+      }
+
+      function openSaved(item) {
+        const location = { type: "coordinates", lat: item.lat, lng: item.lng, label: `${item.lat},${item.lng}` };
+        els.locationInput.value = location.label;
+        syncCoordinateFields(location);
+        const metadata = {
+          status: "OK",
+          pano_id: item.pano,
+          date: item.date,
+          location: { lat: item.lat, lng: item.lng },
+        };
+        state.currentLocation = location;
+        state.lastMetadata = metadata;
+        renderMetadata(metadata);
+        loadEmbed(location, metadata);
+        setStatus("ok", `已打开记录：${formatLatLng(metadata.location)}`);
+      }
+
+      async function scanNearby() {
+        const base = readLocationFromFields();
+        if (base.type !== "coordinates") {
+          toast("附近探测需要明确的经纬度。");
+          return;
+        }
+        if (!els.apiKey.value.trim()) {
+          toast("请先填写 Google Maps API key。");
+          return;
+        }
+
+        els.nearbyBtn.disabled = true;
+        els.nearbyList.innerHTML = "";
+        els.nearbyList.append(emptyListText("正在探测附近 8 个点..."));
+
+        const offsets = [
+          [0, 0],
+          [0.00035, 0],
+          [-0.00035, 0],
+          [0, 0.00035],
+          [0, -0.00035],
+          [0.0007, 0.0007],
+          [0.0007, -0.0007],
+          [-0.0007, 0.0007],
+          [-0.0007, -0.0007],
+        ];
+
+        const found = [];
+        for (const [latOffset, lngOffset] of offsets) {
+          const loc = {
+            type: "coordinates",
+            lat: base.lat + latOffset,
+            lng: base.lng + lngOffset,
+            label: `${(base.lat + latOffset).toFixed(6)},${(base.lng + lngOffset).toFixed(6)}`,
+          };
+          try {
+            const res = await fetch(metadataUrl(loc));
+            const data = await res.json();
+            if (data.status === "OK" && data.pano_id && !found.some((item) => item.pano === data.pano_id)) {
+              found.push({
+                id: data.pano_id,
+                label: formatLatLng(data.location),
+                lat: data.location.lat,
+                lng: data.location.lng,
+                pano: data.pano_id,
+                date: data.date || "",
+              });
+            }
+          } catch {
+            break;
+          }
+        }
+
+        els.nearbyList.innerHTML = "";
+        if (!found.length) {
+          els.nearbyList.append(emptyListText("附近没有探测到可用街景"));
+        } else {
+          found.forEach((item) => els.nearbyList.append(placeRow(item, "打开", () => openSaved(item))));
+        }
+        els.nearbyBtn.disabled = false;
+      }
+
+      function placeRow(item, actionLabel, onAction) {
+        const row = document.createElement("div");
+        row.className = "place-row";
+
+        const main = document.createElement("div");
+        main.className = "place-main";
+        main.innerHTML = `
+          <div class="place-name">${escapeHtml(item.label || `${item.lat},${item.lng}`)}</div>
+          <div class="place-sub">${escapeHtml(item.date || "日期未知")} · ${escapeHtml(item.pano || "")}</div>
+        `;
+
+        const action = document.createElement("button");
+        action.className = "button icon";
+        action.type = "button";
+        action.textContent = "↗";
+        action.title = actionLabel;
+        action.addEventListener("click", onAction);
+
+        const copy = document.createElement("button");
+        copy.className = "button icon";
+        copy.type = "button";
+        copy.textContent = "⧉";
+        copy.title = "复制坐标";
+        copy.addEventListener("click", () => copyText(`${item.lat},${item.lng}`));
+
+        row.append(main, action, copy);
+        return row;
+      }
+
+      function emptyListText(text) {
+        const div = document.createElement("div");
+        div.className = "place-sub";
+        div.textContent = text;
+        return div;
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char];
+        });
+      }
+
+      function updateUrlState(location) {
+        const params = new URLSearchParams(location.type === "coordinates" ? { lat: location.lat, lng: location.lng } : { q: location.query });
+        params.set("heading", els.heading.value);
+        params.set("pitch", els.pitch.value);
+        params.set("fov", els.fov.value);
+        history.replaceState(null, "", `${location.pathname || ""}?${params.toString()}`);
+      }
+
+      function hydrateFromUrl() {
+        const params = new URLSearchParams(location.search);
+        const key = localStorage.getItem("streetview:apiKey");
+        if (key) els.apiKey.value = key;
+        if (params.has("lat") && params.has("lng")) {
+          els.locationInput.value = `${params.get("lat")},${params.get("lng")}`;
+        } else if (params.has("q")) {
+          els.locationInput.value = params.get("q");
+        }
+        ["heading", "pitch", "fov"].forEach((name) => {
+          if (params.has(name)) els[name].value = params.get(name);
+        });
+        updateSliderLabels();
+        try {
+          syncCoordinateFields(parseLocation(els.locationInput.value));
+        } catch {
+          // Keep the user's raw value visible for correction.
+        }
+      }
+
+      function updateSliderLabels() {
+        els.headingValue.textContent = `${els.heading.value}°`;
+        els.pitchValue.textContent = `${els.pitch.value}°`;
+        els.fovValue.textContent = `${els.fov.value}°`;
+      }
+
+      function copyText(text) {
+        navigator.clipboard.writeText(text).then(
+          () => toast("已复制。"),
+          () => toast("复制失败，浏览器不允许写入剪贴板。"),
+        );
+      }
+
+      function copyShareLink() {
+        if (!state.currentLocation) {
+          toast("先打开一个街景位置。");
+          return;
+        }
+        copyText(location.href);
+      }
+
+      function copyIframe() {
+        if (!state.lastEmbedUrl) {
+          toast("先打开一个街景位置。");
+          return;
+        }
+        copyText(`<iframe width="100%" height="600" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="${state.lastEmbedUrl}"></iframe>`);
+      }
+
+      els.saveKey.addEventListener("click", () => {
+        localStorage.setItem("streetview:apiKey", els.apiKey.value.trim());
+        toast("API key 已保存到当前浏览器。");
+      });
+
+      els.locationInput.addEventListener("input", () => {
+        try {
+          syncCoordinateFields(parseLocation(els.locationInput.value));
+        } catch {
+          els.latInput.value = "";
+          els.lngInput.value = "";
+        }
+      });
+
+      [els.heading, els.pitch, els.fov].forEach((input) => {
+        input.addEventListener("input", () => {
+          updateSliderLabels();
+          if (state.currentLocation && state.lastMetadata?.status === "OK") {
+            loadEmbed(state.currentLocation, state.lastMetadata);
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-heading]").forEach((button) => {
+        button.addEventListener("click", () => {
+          els.heading.value = button.dataset.heading;
+          updateSliderLabels();
+          if (state.currentLocation && state.lastMetadata?.status === "OK") loadEmbed(state.currentLocation, state.lastMetadata);
+        });
+      });
+
+      document.querySelector("#randomHeading").addEventListener("click", () => {
+        els.heading.value = Math.round(Math.random() * 360);
+        updateSliderLabels();
+        if (state.currentLocation && state.lastMetadata?.status === "OK") loadEmbed(state.currentLocation, state.lastMetadata);
+      });
+
+      els.checkBtn.addEventListener("click", () => {
+        checkStreetView().catch((error) => {
+          setStatus("bad", error.message);
+          toast(error.message);
+        });
+      });
+
+      els.nearbyBtn.addEventListener("click", () => {
+        scanNearby().catch((error) => toast(error.message));
+      });
+
+      els.favoriteBtn.addEventListener("click", favoriteCurrent);
+      els.clearBtn.addEventListener("click", () => {
+        state.saved = [];
+        setJson("streetview:saved", state.saved);
+        renderSaved();
+        toast("记录已清空。");
+      });
+      els.copyLink.addEventListener("click", copyShareLink);
+      els.copyEmbed.addEventListener("click", copyIframe);
+
+      hydrateFromUrl();
+      renderSaved();
+    </script>
+  </body>
+</html>
