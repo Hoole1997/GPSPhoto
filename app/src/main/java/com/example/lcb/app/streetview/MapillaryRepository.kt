@@ -1,6 +1,8 @@
 package com.example.lcb.app.streetview
 
+import android.content.Context
 import com.example.lcb.app.BuildConfig
+import com.example.lcb.app.R
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +23,7 @@ import java.util.Locale
  * region queries via the `bbox` parameter, so we can pull a whole visible area
  * at once. Free with a client access token.
  */
-class MapillaryRepository {
+class MapillaryRepository(private val context: Context) {
 
     /**
      * @param bounds visible map bounds to search within
@@ -60,7 +62,7 @@ class MapillaryRepository {
         try {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 return@withContext Result.failure(
-                    IllegalStateException("Mapillary 请求失败：HTTP ${connection.responseCode}")
+                    IllegalStateException("Mapillary request failed: HTTP ${connection.responseCode}")
                 )
             }
             val body = connection.inputStream.bufferedReader().use { it.readText() }
@@ -94,14 +96,15 @@ class MapillaryRepository {
                 ?.takeIf { it.isNotBlank() }
 
             val subtitleText = buildString {
-                append(if (isPano) "360° 全景" else "街景")
+                append(if (isPano) context.getString(R.string.sv_pano) else context.getString(R.string.sv_street))
                 if (dateStr != null) append(" · $dateStr")
                 if (creator != null) append(" · @$creator")
             }
 
             spots.add(
                 StreetViewSpot(
-                    title = if (isPano) "Mapillary 全景" else "Mapillary 街景",
+                    title = if (isPano) context.getString(R.string.mapillary_pano_title)
+                    else context.getString(R.string.mapillary_street_title),
                     subtitle = subtitleText,
                     position = LatLng(lat, lng),
                     date = dateStr,

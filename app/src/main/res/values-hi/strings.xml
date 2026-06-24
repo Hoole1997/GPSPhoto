@@ -1,0 +1,57 @@
+<resources>
+    <string name="action_my_location">मेरा स्थान</string>
+    <string name="action_settings">सेटिंग्स</string>
+    <string name="action_map_type">मानचित्र प्रकार बदलें</string>
+    <string name="action_zoom_in">ज़ूम इन</string>
+    <string name="action_zoom_out">ज़ूम आउट</string>
+
+    <string name="search_hint">स्थान और स्ट्रीट व्यू खोजें</string>
+    <string name="search_clear">साफ़ करें</string>
+    <string name="search_use_location">मेरा स्थान उपयोग करें</string>
+    <string name="search_history">खोज इतिहास</string>
+    <string name="search_clear_history">साफ़ करें</string>
+    <string name="search_recommend">लोकप्रिय</string>
+    <string name="search_no_result">कोई स्थान नहीं मिला</string>
+    <string name="search_error">खोज विफल, कृपया पुनः प्रयास करें</string>
+
+    <string name="location_permission_rationale">मानचित्र पर आपका स्थान दिखाने के लिए स्थान अनुमति आवश्यक है</string>
+    <string name="location_permission_denied">स्थान अनुमति अस्वीकृत, स्थान नहीं दिखा सकते</string>
+    <string name="location_unavailable">आपका स्थान प्राप्त नहीं हो सका, कृपया लोकेशन चालू करें</string>
+
+    <string name="street_view_searching">आस-पास स्ट्रीट व्यू खोजी जा रही हैं…</string>
+    <string name="street_view_found">आस-पास %1$d स्ट्रीट व्यू मिलीं</string>
+    <string name="street_view_none">आस-पास कोई स्ट्रीट व्यू नहीं</string>
+    <string name="street_view_error">खोज विफल, कृपया पुनः प्रयास करें</string>
+    <string name="street_view_marker_title">स्ट्रीट व्यू</string>
+    <string name="street_view_nearby_idle">स्थान मिलने पर आस-पास की व्यू दिखेंगी</string>
+    <string name="my_location_title">मेरा स्थान</string>
+    <string name="sv_pano">360° पैनोरमा</string>
+    <string name="sv_street">स्ट्रीट व्यू</string>
+    <string name="sv_date_prefix">%1$s को लिया गया</string>
+    <string name="sv_date_unknown">तिथि अज्ञात</string>
+    <string name="mapillary_pano_title">Mapillary पैनोरमा</string>
+    <string name="mapillary_street_title">Mapillary स्ट्रीट व्यू</string>
+
+    <string name="tab_hot">लोकप्रिय</string>
+    <string name="tab_nearby">आस-पास</string>
+
+    <string name="sv_loading">स्ट्रीट व्यू लोड हो रही है…</string>
+    <string name="sv_error">लोड विफल, नेटवर्क जांचें और पुनः प्रयास करें</string>
+    <string name="sv_retry">पुनः लोड करें</string>
+    <string name="sv_back">वापस</string>
+    <string name="sv_open_external_failed">बाहरी लिंक नहीं खुल सका</string>
+
+    <string name="perm_dialog_title">सूचना</string>
+    <string name="perm_dialog_message">आपका स्थान दिखाने और आस-पास की स्ट्रीट व्यू सुझाने के लिए स्थान अनुमति आवश्यक है।</string>
+    <string name="perm_dialog_grant">अनुमति दें</string>
+
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="settings_language">भाषा</string>
+    <string name="settings_language_system">सिस्टम डिफ़ॉल्ट</string>
+    <string name="settings_privacy">गोपनीयता नीति</string>
+    <string name="settings_about">परिचय</string>
+    <string name="settings_language_pick">भाषा चुनें</string>
+    <string name="about_app_desc">Street View Explorer — दुनिया भर की स्ट्रीट व्यू देखें और अपने आस-पास की खूबसूरती खोजें।</string>
+    <string name="about_version">संस्करण %1$s</string>
+
+</resources>

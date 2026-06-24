@@ -1,0 +1,57 @@
+<resources>
+    <string name="action_my_location">Minha localização</string>
+    <string name="action_settings">Configurações</string>
+    <string name="action_map_type">Mudar tipo de mapa</string>
+    <string name="action_zoom_in">Ampliar</string>
+    <string name="action_zoom_out">Reduzir</string>
+
+    <string name="search_hint">Buscar lugares e street views</string>
+    <string name="search_clear">Limpar</string>
+    <string name="search_use_location">Usar minha localização</string>
+    <string name="search_history">Histórico de busca</string>
+    <string name="search_clear_history">Limpar</string>
+    <string name="search_recommend">Populares</string>
+    <string name="search_no_result">Nenhum lugar encontrado</string>
+    <string name="search_error">Falha na busca, tente novamente</string>
+
+    <string name="location_permission_rationale">A permissão de localização é necessária para mostrar sua posição no mapa</string>
+    <string name="location_permission_denied">Permissão negada, não é possível mostrar sua posição</string>
+    <string name="location_unavailable">Não foi possível obter sua localização, ative a localização</string>
+
+    <string name="street_view_searching">Buscando street views próximas…</string>
+    <string name="street_view_found">%1$d street views encontradas por perto</string>
+    <string name="street_view_none">Nenhuma street view por perto</string>
+    <string name="street_view_error">Falha na busca, tente novamente</string>
+    <string name="street_view_marker_title">Street view</string>
+    <string name="street_view_nearby_idle">As street views próximas aparecem após localizar</string>
+    <string name="my_location_title">Minha localização</string>
+    <string name="sv_pano">Panorama 360°</string>
+    <string name="sv_street">Street view</string>
+    <string name="sv_date_prefix">Capturada em %1$s</string>
+    <string name="sv_date_unknown">Data desconhecida</string>
+    <string name="mapillary_pano_title">Panorama Mapillary</string>
+    <string name="mapillary_street_title">Street view Mapillary</string>
+
+    <string name="tab_hot">Populares</string>
+    <string name="tab_nearby">Próximas</string>
+
+    <string name="sv_loading">Carregando street view…</string>
+    <string name="sv_error">Falha ao carregar, verifique a rede e tente novamente</string>
+    <string name="sv_retry">Recarregar</string>
+    <string name="sv_back">Voltar</string>
+    <string name="sv_open_external_failed">Não é possível abrir o link externo</string>
+
+    <string name="perm_dialog_title">Aviso</string>
+    <string name="perm_dialog_message">A permissão de localização é necessária para mostrar sua posição e recomendar street views próximas.</string>
+    <string name="perm_dialog_grant">Conceder acesso</string>
+
+    <string name="settings_title">Configurações</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_system">Padrão do sistema</string>
+    <string name="settings_privacy">Política de Privacidade</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_language_pick">Escolher idioma</string>
+    <string name="about_app_desc">Street View Explorer — explore street views pelo mundo e descubra o que está ao seu redor.</string>
+    <string name="about_version">Versão %1$s</string>
+
+</resources>

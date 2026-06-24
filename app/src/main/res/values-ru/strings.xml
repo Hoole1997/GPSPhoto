@@ -1,0 +1,57 @@
+<resources>
+    <string name="action_my_location">Моё местоположение</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_map_type">Сменить тип карты</string>
+    <string name="action_zoom_in">Приблизить</string>
+    <string name="action_zoom_out">Отдалить</string>
+
+    <string name="search_hint">Поиск мест и панорам</string>
+    <string name="search_clear">Очистить</string>
+    <string name="search_use_location">Использовать моё местоположение</string>
+    <string name="search_history">История поиска</string>
+    <string name="search_clear_history">Очистить</string>
+    <string name="search_recommend">Популярное</string>
+    <string name="search_no_result">Места не найдены</string>
+    <string name="search_error">Ошибка поиска, попробуйте снова</string>
+
+    <string name="location_permission_rationale">Для показа вашего местоположения нужно разрешение геолокации</string>
+    <string name="location_permission_denied">Разрешение отклонено, невозможно показать местоположение</string>
+    <string name="location_unavailable">Не удалось определить местоположение, включите геолокацию</string>
+
+    <string name="street_view_searching">Поиск панорам поблизости…</string>
+    <string name="street_view_found">Найдено %1$d панорам поблизости</string>
+    <string name="street_view_none">Поблизости нет панорам</string>
+    <string name="street_view_error">Ошибка поиска, попробуйте снова</string>
+    <string name="street_view_marker_title">Панорама</string>
+    <string name="street_view_nearby_idle">Панорамы появятся после определения местоположения</string>
+    <string name="my_location_title">Моё местоположение</string>
+    <string name="sv_pano">Панорама 360°</string>
+    <string name="sv_street">Панорама улиц</string>
+    <string name="sv_date_prefix">Снято %1$s</string>
+    <string name="sv_date_unknown">Дата неизвестна</string>
+    <string name="mapillary_pano_title">Панорама Mapillary</string>
+    <string name="mapillary_street_title">Панорама Mapillary</string>
+
+    <string name="tab_hot">Популярное</string>
+    <string name="tab_nearby">Рядом</string>
+
+    <string name="sv_loading">Загрузка панорамы…</string>
+    <string name="sv_error">Не удалось загрузить, проверьте сеть и повторите</string>
+    <string name="sv_retry">Перезагрузить</string>
+    <string name="sv_back">Назад</string>
+    <string name="sv_open_external_failed">Невозможно открыть внешнюю ссылку</string>
+
+    <string name="perm_dialog_title">Уведомление</string>
+    <string name="perm_dialog_message">Разрешение геолокации нужно, чтобы показать ваше местоположение и панорамы рядом.</string>
+    <string name="perm_dialog_grant">Разрешить</string>
+
+    <string name="settings_title">Настройки</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_language_system">Системный по умолчанию</string>
+    <string name="settings_privacy">Политика конфиденциальности</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_language_pick">Выберите язык</string>
+    <string name="about_app_desc">Street View Explorer — исследуйте панорамы улиц по всему миру и открывайте то, что рядом.</string>
+    <string name="about_version">Версия %1$s</string>
+
+</resources>

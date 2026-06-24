@@ -44,7 +44,7 @@ class StreetViewRepository {
     ): Result<List<StreetViewPanorama>> = withContext(Dispatchers.IO) {
         val key = BuildConfig.MAPS_API_KEY
         if (key.isBlank()) {
-            return@withContext Result.failure(IllegalStateException("缺少 Maps API key"))
+            return@withContext Result.failure(IllegalStateException("Missing Maps API key"))
         }
 
         val samples = buildGrid(center, radiusMeters, step)
@@ -75,10 +75,10 @@ class StreetViewRepository {
             when {
                 deduped.isNotEmpty() -> Result.success(deduped.values.toList())
                 denied -> Result.failure(
-                    IllegalStateException("街景请求被拒绝，请确认 Cloud 项目已启用 Street View Static API")
+                    IllegalStateException("Street View request denied. Enable Street View Static API for the project")
                 )
                 anyNetworkError -> Result.failure(
-                    IllegalStateException("网络异常，街景搜索失败")
+                    IllegalStateException("Network error, street view search failed")
                 )
                 else -> Result.success(emptyList())
             }

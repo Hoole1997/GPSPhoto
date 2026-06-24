@@ -1,5 +1,7 @@
 package com.example.lcb.app.streetview
 
+import android.content.Context
+import com.example.lcb.app.R
 import com.google.android.gms.maps.model.LatLng
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -27,11 +29,12 @@ data class StreetViewSpot(
 
 enum class StreetViewSource { GOOGLE, MAPILLARY }
 
-fun StreetViewPanorama.toSpot(origin: LatLng): StreetViewSpot {
+fun StreetViewPanorama.toSpot(origin: LatLng, context: Context): StreetViewSpot {
     val distance = haversineMeters(origin, position)
     return StreetViewSpot(
-        title = "街景点",
-        subtitle = date?.let { "拍摄于 $it" } ?: "拍摄日期未知",
+        title = context.getString(R.string.street_view_marker_title),
+        subtitle = date?.let { context.getString(R.string.sv_date_prefix, it) }
+            ?: context.getString(R.string.sv_date_unknown),
         position = position,
         date = date,
         distanceMeters = distance,

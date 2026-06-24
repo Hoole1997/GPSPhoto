@@ -5,14 +5,14 @@ import com.example.lcb.app.ad.LcbAdInitializer
 import com.google.android.gms.maps.MapsInitializer
 import net.corekit.metrics.adjust.AdjustTracker
 
-class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
+class LcbApp : com.gpsphoto.locationmap.tool.Odo8klyq5p4gfd76igpq() {
 
     companion object {
 
         var lcbApp: LcbApp? = null
 
         fun backLaunchActivity() {
-            lcbApp?.scansafeloc()
+            lcbApp?.checkdoc()
         }
     }
 
@@ -25,7 +25,7 @@ class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
             MapsInitializer.Renderer.LATEST
         ) { /* renderer ready, no-op */ }
         LcbAdInitializer.initialize(this)
-        this.maxquicklitememory {isOrganic, network, campaign, adgroup, creative, jsonResponse ->
+        this.autoscancompass {isOrganic, network, campaign, adgroup, creative, jsonResponse ->
             AdjustTracker.init(
                 context = applicationContext,
                 network = network,
@@ -39,13 +39,17 @@ class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
 
     }
 
-    override fun smartbackuptoolsignal(): Class<in Any>? {
+    override fun toolcache(): Class<in Any>? {
         return MainActivity::class.java as Class<in Any>?
     }
 
-    override fun prodailysmartmemory(): List<Class<in Any>?>? {
+    override fun organizesafevault(): List<Class<in Any>?>? {
         return listOf(
-            MainActivity::class.java
+            MainActivity::class.java,
+            StreetViewActivity::class.java,
+            SearchActivity::class.java,
+            SettingsActivity::class.java,
+            AboutActivity::class.java
         ) as List<Class<in Any>?>?
     }
 

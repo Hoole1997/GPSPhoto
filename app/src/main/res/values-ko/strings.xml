@@ -1,0 +1,57 @@
+<resources>
+    <string name="action_my_location">내 위치</string>
+    <string name="action_settings">설정</string>
+    <string name="action_map_type">지도 유형 전환</string>
+    <string name="action_zoom_in">확대</string>
+    <string name="action_zoom_out">축소</string>
+
+    <string name="search_hint">장소 및 스트리트 뷰 검색</string>
+    <string name="search_clear">지우기</string>
+    <string name="search_use_location">내 위치 사용</string>
+    <string name="search_history">검색 기록</string>
+    <string name="search_clear_history">지우기</string>
+    <string name="search_recommend">인기</string>
+    <string name="search_no_result">일치하는 장소가 없습니다</string>
+    <string name="search_error">검색에 실패했습니다. 다시 시도하세요</string>
+
+    <string name="location_permission_rationale">지도에 현재 위치를 표시하려면 위치 권한이 필요합니다</string>
+    <string name="location_permission_denied">위치 권한이 거부되어 현재 위치를 표시할 수 없습니다</string>
+    <string name="location_unavailable">위치를 가져올 수 없습니다. 위치 서비스를 켜세요</string>
+
+    <string name="street_view_searching">주변 스트리트 뷰 검색 중…</string>
+    <string name="street_view_found">주변에서 %1$d개의 스트리트 뷰를 찾았습니다</string>
+    <string name="street_view_none">주변에 스트리트 뷰가 없습니다</string>
+    <string name="street_view_error">검색에 실패했습니다. 다시 시도하세요</string>
+    <string name="street_view_marker_title">스트리트 뷰</string>
+    <string name="street_view_nearby_idle">위치 확인 후 주변 뷰가 표시됩니다</string>
+    <string name="my_location_title">내 위치</string>
+    <string name="sv_pano">360° 파노라마</string>
+    <string name="sv_street">스트리트 뷰</string>
+    <string name="sv_date_prefix">촬영일 %1$s</string>
+    <string name="sv_date_unknown">날짜 미상</string>
+    <string name="mapillary_pano_title">Mapillary 파노라마</string>
+    <string name="mapillary_street_title">Mapillary 스트리트 뷰</string>
+
+    <string name="tab_hot">인기</string>
+    <string name="tab_nearby">주변</string>
+
+    <string name="sv_loading">스트리트 뷰 로딩 중…</string>
+    <string name="sv_error">불러오기 실패. 네트워크를 확인하고 다시 시도하세요</string>
+    <string name="sv_retry">다시 불러오기</string>
+    <string name="sv_back">뒤로</string>
+    <string name="sv_open_external_failed">외부 링크를 열 수 없습니다</string>
+
+    <string name="perm_dialog_title">알림</string>
+    <string name="perm_dialog_message">현재 위치를 표시하고 주변 스트리트 뷰를 추천하기 위해 위치 권한이 필요합니다.</string>
+    <string name="perm_dialog_grant">권한 허용</string>
+
+    <string name="settings_title">설정</string>
+    <string name="settings_language">언어</string>
+    <string name="settings_language_system">시스템 기본값</string>
+    <string name="settings_privacy">개인정보 처리방침</string>
+    <string name="settings_about">정보</string>
+    <string name="settings_language_pick">언어 선택</string>
+    <string name="about_app_desc">Street View Explorer — 전 세계 스트리트 뷰를 둘러보고 주변의 멋진 곳을 발견하세요.</string>
+    <string name="about_version">버전 %1$s</string>
+
+</resources>

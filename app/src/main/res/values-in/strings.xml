@@ -1,0 +1,57 @@
+<resources>
+    <string name="action_my_location">Lokasi saya</string>
+    <string name="action_settings">Pengaturan</string>
+    <string name="action_map_type">Ganti jenis peta</string>
+    <string name="action_zoom_in">Perbesar</string>
+    <string name="action_zoom_out">Perkecil</string>
+
+    <string name="search_hint">Cari tempat dan street view</string>
+    <string name="search_clear">Hapus</string>
+    <string name="search_use_location">Gunakan lokasi saya</string>
+    <string name="search_history">Riwayat pencarian</string>
+    <string name="search_clear_history">Bersihkan</string>
+    <string name="search_recommend">Populer</string>
+    <string name="search_no_result">Tidak ada tempat ditemukan</string>
+    <string name="search_error">Pencarian gagal, coba lagi</string>
+
+    <string name="location_permission_rationale">Izin lokasi diperlukan untuk menampilkan posisi Anda di peta</string>
+    <string name="location_permission_denied">Izin lokasi ditolak, tidak dapat menampilkan posisi Anda</string>
+    <string name="location_unavailable">Tidak dapat memperoleh lokasi, pastikan lokasi aktif</string>
+
+    <string name="street_view_searching">Mencari street view terdekat…</string>
+    <string name="street_view_found">Ditemukan %1$d street view terdekat</string>
+    <string name="street_view_none">Tidak ada street view terdekat</string>
+    <string name="street_view_error">Pencarian gagal, coba lagi</string>
+    <string name="street_view_marker_title">Street view</string>
+    <string name="street_view_nearby_idle">Street view terdekat muncul setelah lokasi ditemukan</string>
+    <string name="my_location_title">Lokasi saya</string>
+    <string name="sv_pano">Panorama 360°</string>
+    <string name="sv_street">Street view</string>
+    <string name="sv_date_prefix">Diambil %1$s</string>
+    <string name="sv_date_unknown">Tanggal tidak diketahui</string>
+    <string name="mapillary_pano_title">Panorama Mapillary</string>
+    <string name="mapillary_street_title">Street view Mapillary</string>
+
+    <string name="tab_hot">Populer</string>
+    <string name="tab_nearby">Terdekat</string>
+
+    <string name="sv_loading">Memuat street view…</string>
+    <string name="sv_error">Gagal memuat, periksa jaringan dan coba lagi</string>
+    <string name="sv_retry">Muat ulang</string>
+    <string name="sv_back">Kembali</string>
+    <string name="sv_open_external_failed">Tidak dapat membuka tautan eksternal</string>
+
+    <string name="perm_dialog_title">Pemberitahuan</string>
+    <string name="perm_dialog_message">Izin lokasi diperlukan untuk menampilkan posisi Anda dan merekomendasikan street view terdekat.</string>
+    <string name="perm_dialog_grant">Beri izin</string>
+
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="settings_language_system">Default sistem</string>
+    <string name="settings_privacy">Kebijakan Privasi</string>
+    <string name="settings_about">Tentang</string>
+    <string name="settings_language_pick">Pilih bahasa</string>
+    <string name="about_app_desc">Street View Explorer — jelajahi street view di seluruh dunia dan temukan yang ada di sekitar Anda.</string>
+    <string name="about_version">Versi %1$s</string>
+
+</resources>

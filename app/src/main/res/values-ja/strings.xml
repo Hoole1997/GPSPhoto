@@ -1,0 +1,57 @@
+<resources>
+    <string name="action_my_location">現在地</string>
+    <string name="action_settings">設定</string>
+    <string name="action_map_type">地図の種類を切り替え</string>
+    <string name="action_zoom_in">拡大</string>
+    <string name="action_zoom_out">縮小</string>
+
+    <string name="search_hint">場所やストリートビューを検索</string>
+    <string name="search_clear">クリア</string>
+    <string name="search_use_location">現在地を使う</string>
+    <string name="search_history">検索履歴</string>
+    <string name="search_clear_history">消去</string>
+    <string name="search_recommend">人気</string>
+    <string name="search_no_result">該当する場所が見つかりません</string>
+    <string name="search_error">検索に失敗しました。もう一度お試しください</string>
+
+    <string name="location_permission_rationale">地図に現在地を表示するには位置情報の許可が必要です</string>
+    <string name="location_permission_denied">位置情報が拒否されたため現在地を表示できません</string>
+    <string name="location_unavailable">現在地を取得できません。位置情報をオンにしてください</string>
+
+    <string name="street_view_searching">近くのストリートビューを検索中…</string>
+    <string name="street_view_found">近くで %1$d 件のストリートビューが見つかりました</string>
+    <string name="street_view_none">近くにストリートビューがありません</string>
+    <string name="street_view_error">検索に失敗しました。もう一度お試しください</string>
+    <string name="street_view_marker_title">ストリートビュー</string>
+    <string name="street_view_nearby_idle">現在地を取得すると近くのビューが表示されます</string>
+    <string name="my_location_title">現在地</string>
+    <string name="sv_pano">360° パノラマ</string>
+    <string name="sv_street">ストリートビュー</string>
+    <string name="sv_date_prefix">撮影日 %1$s</string>
+    <string name="sv_date_unknown">撮影日不明</string>
+    <string name="mapillary_pano_title">Mapillary パノラマ</string>
+    <string name="mapillary_street_title">Mapillary ストリートビュー</string>
+
+    <string name="tab_hot">人気</string>
+    <string name="tab_nearby">周辺</string>
+
+    <string name="sv_loading">ストリートビューを読み込み中…</string>
+    <string name="sv_error">読み込みに失敗しました。通信環境を確認して再試行してください</string>
+    <string name="sv_retry">再読み込み</string>
+    <string name="sv_back">戻る</string>
+    <string name="sv_open_external_failed">外部リンクを開けません</string>
+
+    <string name="perm_dialog_title">お知らせ</string>
+    <string name="perm_dialog_message">現在地を表示し周辺のストリートビューをおすすめするため、位置情報の許可が必要です。</string>
+    <string name="perm_dialog_grant">許可する</string>
+
+    <string name="settings_title">設定</string>
+    <string name="settings_language">言語</string>
+    <string name="settings_language_system">システムに従う</string>
+    <string name="settings_privacy">プライバシーポリシー</string>
+    <string name="settings_about">アプリについて</string>
+    <string name="settings_language_pick">言語を選択</string>
+    <string name="about_app_desc">Street View Explorer — 世界中のストリートビューを巡り、身の回りの魅力を発見しよう。</string>
+    <string name="about_version">バージョン %1$s</string>
+
+</resources>

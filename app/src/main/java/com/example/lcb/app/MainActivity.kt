@@ -19,6 +19,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.example.lcb.app.streetview.StreetViewPagerAdapter
 import com.example.lcb.app.streetview.StreetViewViewModel
+import com.example.lcb.app.utils.loadInterstitial
+import com.example.lcb.app.utils.loadNative
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -74,6 +76,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private val searchLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val data = result.data ?: return@registerForActivityResult
+        if (data.getBooleanExtra(SearchActivity.EXTRA_USE_MY_LOCATION, false)) {
+            requestLocationOrPermission()
+            return@registerForActivityResult
+        }
+        val lat = data.getDoubleExtra(SearchActivity.EXTRA_LAT, Double.NaN)
+        val lng = data.getDoubleExtra(SearchActivity.EXTRA_LNG, Double.NaN)
+        if (!lat.isNaN() && !lng.isNaN()) {
+            flyToAndScan(LatLng(lat, lng))
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -106,6 +124,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         scanOverlay = findViewById(R.id.scanOverlay)
 
+        // 点击顶部搜索框 → 打开搜索页（带当前可见区域用于结果偏向）
+        findViewById<android.view.View>(R.id.searchBar).setOnClickListener {
+            val bias = googleMap?.projection?.visibleRegion?.latLngBounds
+            searchLauncher.launch(SearchActivity.newIntent(this, bias))
+        }
+
+        // 设置按钮（在搜索框内，单独处理点击，避免触发搜索）
+        findViewById<android.widget.ImageView>(R.id.settingsButton).setOnClickListener {
+            startActivity(SettingsActivity.newIntent(this))
+        }
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapContainer) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -125,6 +154,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setupZoomSlider()
 
         observeViewModel()
+
+        // 底部面板内原生广告
+        loadNative(container = findViewById(R.id.sheetAdContainer))
     }
 
     private fun setupZoomSlider() {
@@ -248,19 +280,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 launch {
                     viewModel.openStreetView.collect { spot ->
                         if (spot != null) {
-                            startActivity(
-                                StreetViewActivity.newIntent(
-                                    this@MainActivity,
-                                    lat = spot.position.latitude,
-                                    lng = spot.position.longitude,
-                                    pano = spot.panoId,
-                                    title = spot.title,
-                                    isMapillary = spot.source ==
-                                        com.example.lcb.app.streetview.StreetViewSource.MAPILLARY,
-                                    mapillaryId = spot.mapillaryId
-                                )
+                            val intent = StreetViewActivity.newIntent(
+                                this@MainActivity,
+                                lat = spot.position.latitude,
+                                lng = spot.position.longitude,
+                                pano = spot.panoId,
+                                title = spot.title,
+                                isMapillary = spot.source ==
+                                    com.example.lcb.app.streetview.StreetViewSource.MAPILLARY,
+                                mapillaryId = spot.mapillaryId
                             )
                             viewModel.consumeOpenStreetView()
+                            openStreetViewWithAd(intent)
                         }
                     }
                 }
@@ -327,6 +358,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             primeWithLastLocation()
             moveToCurrentLocation()
         } else {
+            showLocationPermissionDialog()
+        }
+    }
+
+    /** 申请定位权限前，先弹出自定义提示框（不可点击外部取消，仅“去授权”按钮）。 */
+    private fun showLocationPermissionDialog() {
+        val view = layoutInflater.inflate(R.layout.dialog_location_permission, null)
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(view)
+            .setCancelable(false)
+            .create()
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.window?.setBackgroundDrawable(
+            android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+        )
+        view.findViewById<android.widget.TextView>(R.id.grantButton).setOnClickListener {
+            dialog.dismiss()
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -334,6 +382,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             )
         }
+        dialog.show()
+        // 控制弹框宽度，留出两侧边距，整体更小巧
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.72f).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     @SuppressLint("MissingPermission")
@@ -392,7 +446,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             userMarker = map.addMarker(
                 MarkerOptions()
                     .position(latLng)
-                    .title("我的位置")
+                    .title(getString(R.string.my_location_title))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
             )
         }
@@ -428,6 +482,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     /** 地图重建后重新把已发现的街景点喂给聚合管理器。 */
     private fun restorePanoramaMarkers() {
         renderPanoramaMarkers(viewModel.markers.value)
+    }
+
+    /**
+     * 搜索选中地点后：飞到该坐标，再在该处触发扫描。
+     */
+    private fun flyToAndScan(target: LatLng) {
+        val map = googleMap ?: return
+        val zoom = SCAN_TARGET_ZOOM
+        map.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(target, zoom),
+            700,
+            object : GoogleMap.CancelableCallback {
+                override fun onFinish() {
+                    performScan(target)
+                }
+
+                override fun onCancel() {
+                    performScan(target)
+                }
+            }
+        )
     }
 
     /**
@@ -543,6 +618,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             ) == PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * 打开街景前按频率门控展示一次插屏；展示/关闭或失败后都继续打开街景。
+     */
+    private fun openStreetViewWithAd(intent: android.content.Intent) {
+        if (com.example.lcb.app.utils.AdGate.shouldShowOnStreetViewOpen()) {
+            loadInterstitial(condition = { true }) { shown: Boolean ->
+                if (shown) com.example.lcb.app.utils.AdGate.markInterstitialShown()
+                startActivity(intent)
+            }
+        } else {
+            startActivity(intent)
+        }
+    }
+
     private fun toast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
@@ -554,6 +643,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onDestroy() {
         cancellationTokenSource.cancel()
         super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        LcbApp.backLaunchActivity()
     }
 
     companion object {

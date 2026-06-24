@@ -1,0 +1,57 @@
+<resources>
+    <string name="action_my_location">موقعي</string>
+    <string name="action_settings">الإعدادات</string>
+    <string name="action_map_type">تغيير نوع الخريطة</string>
+    <string name="action_zoom_in">تكبير</string>
+    <string name="action_zoom_out">تصغير</string>
+
+    <string name="search_hint">ابحث عن الأماكن ومشاهد الشارع</string>
+    <string name="search_clear">مسح</string>
+    <string name="search_use_location">استخدام موقعي</string>
+    <string name="search_history">سجل البحث</string>
+    <string name="search_clear_history">مسح</string>
+    <string name="search_recommend">شائع</string>
+    <string name="search_no_result">لم يتم العثور على أماكن</string>
+    <string name="search_error">فشل البحث، حاول مرة أخرى</string>
+
+    <string name="location_permission_rationale">إذن الموقع مطلوب لعرض موضعك على الخريطة</string>
+    <string name="location_permission_denied">تم رفض إذن الموقع، لا يمكن عرض موضعك</string>
+    <string name="location_unavailable">تعذر الحصول على موقعك، يرجى تشغيل خدمة الموقع</string>
+
+    <string name="street_view_searching">جارٍ البحث عن مشاهد الشارع القريبة…</string>
+    <string name="street_view_found">تم العثور على %1$d من مشاهد الشارع القريبة</string>
+    <string name="street_view_none">لا توجد مشاهد شارع قريبة</string>
+    <string name="street_view_error">فشل البحث، حاول مرة أخرى</string>
+    <string name="street_view_marker_title">مشهد الشارع</string>
+    <string name="street_view_nearby_idle">تظهر المشاهد القريبة بعد تحديد الموقع</string>
+    <string name="my_location_title">موقعي</string>
+    <string name="sv_pano">بانوراما 360°</string>
+    <string name="sv_street">مشهد الشارع</string>
+    <string name="sv_date_prefix">التُقطت في %1$s</string>
+    <string name="sv_date_unknown">التاريخ غير معروف</string>
+    <string name="mapillary_pano_title">بانوراما Mapillary</string>
+    <string name="mapillary_street_title">مشهد شارع Mapillary</string>
+
+    <string name="tab_hot">شائع</string>
+    <string name="tab_nearby">قريب</string>
+
+    <string name="sv_loading">جارٍ تحميل مشهد الشارع…</string>
+    <string name="sv_error">فشل التحميل، تحقق من الشبكة وأعد المحاولة</string>
+    <string name="sv_retry">إعادة التحميل</string>
+    <string name="sv_back">رجوع</string>
+    <string name="sv_open_external_failed">تعذر فتح الرابط الخارجي</string>
+
+    <string name="perm_dialog_title">تنبيه</string>
+    <string name="perm_dialog_message">إذن الموقع مطلوب لعرض موضعك واقتراح مشاهد الشارع القريبة.</string>
+    <string name="perm_dialog_grant">منح الإذن</string>
+
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_language_system">افتراضي النظام</string>
+    <string name="settings_privacy">سياسة الخصوصية</string>
+    <string name="settings_about">حول</string>
+    <string name="settings_language_pick">اختر اللغة</string>
+    <string name="about_app_desc">Street View Explorer — تصفّح مشاهد الشوارع حول العالم واكتشف ما حولك.</string>
+    <string name="about_version">الإصدار %1$s</string>
+
+</resources>

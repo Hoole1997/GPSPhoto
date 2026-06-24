@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "1012507371143",
-    "project_id": "agfa90615218-7f3a0-gp",
-    "storage_bucket": "agfa90615218-7f3a0-gp.firebasestorage.app"
+    "project_number": "959020978350",
+    "project_id": "agf39733d9d2-0537d-gp",
+    "storage_bucket": "agf39733d9d2-0537d-gp.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1012507371143:android:e81fb5088bb420eae03a22",
+        "mobilesdk_app_id": "1:959020978350:android:5bdb4df68e8c481d20dd3f",
         "android_client_info": {
-          "package_name": "com.fluid.document.reader.tool"
+          "package_name": "com.gpsphoto.locationmap.tool"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDk113nYuiHpmTB7q46zWEIJig332YmsA0"
+          "current_key": "AIzaSyBTNcwnKY26GlNfP7uLwo_RKmkczZIV67E"
         }
       ],
       "services": {

@@ -1,0 +1,57 @@
+<resources>
+    <string name="action_my_location">Ma position</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="action_map_type">Changer de type de carte</string>
+    <string name="action_zoom_in">Zoom avant</string>
+    <string name="action_zoom_out">Zoom arrière</string>
+
+    <string name="search_hint">Rechercher des lieux et des vues</string>
+    <string name="search_clear">Effacer</string>
+    <string name="search_use_location">Utiliser ma position</string>
+    <string name="search_history">Historique de recherche</string>
+    <string name="search_clear_history">Effacer</string>
+    <string name="search_recommend">Populaires</string>
+    <string name="search_no_result">Aucun lieu trouvé</string>
+    <string name="search_error">Échec de la recherche, réessayez</string>
+
+    <string name="location_permission_rationale">L\'autorisation de localisation est nécessaire pour afficher votre position</string>
+    <string name="location_permission_denied">Autorisation refusée, impossible d\'afficher votre position</string>
+    <string name="location_unavailable">Impossible d\'obtenir votre position, vérifiez la localisation</string>
+
+    <string name="street_view_searching">Recherche des vues à proximité…</string>
+    <string name="street_view_found">%1$d vues trouvées à proximité</string>
+    <string name="street_view_none">Aucune vue à proximité</string>
+    <string name="street_view_error">Échec de la recherche, réessayez</string>
+    <string name="street_view_marker_title">Vue de rue</string>
+    <string name="street_view_nearby_idle">Les vues proches apparaissent après localisation</string>
+    <string name="my_location_title">Ma position</string>
+    <string name="sv_pano">Panorama 360°</string>
+    <string name="sv_street">Vue de rue</string>
+    <string name="sv_date_prefix">Prise le %1$s</string>
+    <string name="sv_date_unknown">Date inconnue</string>
+    <string name="mapillary_pano_title">Panorama Mapillary</string>
+    <string name="mapillary_street_title">Vue Mapillary</string>
+
+    <string name="tab_hot">Populaires</string>
+    <string name="tab_nearby">À proximité</string>
+
+    <string name="sv_loading">Chargement de la vue…</string>
+    <string name="sv_error">Échec du chargement, vérifiez le réseau et réessayez</string>
+    <string name="sv_retry">Recharger</string>
+    <string name="sv_back">Retour</string>
+    <string name="sv_open_external_failed">Impossible d\'ouvrir le lien externe</string>
+
+    <string name="perm_dialog_title">Information</string>
+    <string name="perm_dialog_message">L\'autorisation de localisation est nécessaire pour afficher votre position et suggérer des vues proches.</string>
+    <string name="perm_dialog_grant">Autoriser</string>
+
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_language_system">Système par défaut</string>
+    <string name="settings_privacy">Politique de confidentialité</string>
+    <string name="settings_about">À propos</string>
+    <string name="settings_language_pick">Choisir la langue</string>
+    <string name="about_app_desc">Street View Explorer — parcourez les vues de rue du monde entier et découvrez ce qui vous entoure.</string>
+    <string name="about_version">Version %1$s</string>
+
+</resources>

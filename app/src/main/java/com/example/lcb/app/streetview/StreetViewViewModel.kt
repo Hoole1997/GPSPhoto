@@ -1,7 +1,9 @@
 package com.example.lcb.app.streetview
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lcb.app.R
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,10 +14,10 @@ import kotlinx.coroutines.launch
 /**
  * Shared state between the map activity and the bottom-sheet tab fragments.
  */
-class StreetViewViewModel : ViewModel() {
+class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
 
     private val repository = StreetViewRepository()
-    private val mapillaryRepository = MapillaryRepository()
+    private val mapillaryRepository = MapillaryRepository(app)
 
     private val _userLocation = MutableStateFlow<LatLng?>(null)
     val userLocation: StateFlow<LatLng?> = _userLocation.asStateFlow()
@@ -40,8 +42,11 @@ class StreetViewViewModel : ViewModel() {
     private val _scanning = MutableStateFlow(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
 
-    private val _hot = MutableStateFlow(HOT_SPOTS)
+    private val _hot = MutableStateFlow(buildHotSpots())
     val hot: StateFlow<List<StreetViewSpot>> = _hot.asStateFlow()
+
+    /** 供搜索页复用的推荐列表（即热门地标）。 */
+    fun hotSpots(): List<StreetViewSpot> = buildHotSpots()
 
     /** A request to move the map to a spot, consumed by the activity. */
     private val _focusRequest = MutableStateFlow<LatLng?>(null)
@@ -98,7 +103,7 @@ class StreetViewViewModel : ViewModel() {
             repository.findNearbyPanoramas(center)
                 .onSuccess { panoramas ->
                     for (p in panoramas) {
-                        val spot = p.toSpot(center)
+                        val spot = p.toSpot(center, getApplication())
                         discovered[keyOf(spot)] = spot
                     }
                 }
@@ -166,89 +171,45 @@ class StreetViewViewModel : ViewModel() {
 
     private fun distanceMeters(a: LatLng, b: LatLng): Double = distanceMetersBetween(a, b)
 
+    /** 从字符串资源构建热门地标列表（随语言切换本地化）。 */
+    private fun buildHotSpots(): List<StreetViewSpot> {
+        val ctx = getApplication<Application>()
+        fun spot(
+            titleRes: Int, subRes: Int, descRes: Int,
+            lat: Double, lng: Double, cover: String
+        ) = StreetViewSpot(
+            title = ctx.getString(titleRes),
+            subtitle = ctx.getString(subRes),
+            position = LatLng(lat, lng),
+            date = null,
+            distanceMeters = null,
+            coverUrl = cover,
+            description = ctx.getString(descRes)
+        )
+        return listOf(
+            spot(R.string.hot_eiffel_title, R.string.hot_eiffel_sub, R.string.hot_eiffel_desc,
+                48.8584, 2.2945, "https://loremflickr.com/400/300/eiffeltower?lock=1"),
+            spot(R.string.hot_times_title, R.string.hot_times_sub, R.string.hot_times_desc,
+                40.7580, -73.9855, "https://loremflickr.com/400/300/timessquare?lock=2"),
+            spot(R.string.hot_bigben_title, R.string.hot_bigben_sub, R.string.hot_bigben_desc,
+                51.5007, -0.1246, "https://loremflickr.com/400/300/bigben?lock=3"),
+            spot(R.string.hot_colosseum_title, R.string.hot_colosseum_sub, R.string.hot_colosseum_desc,
+                41.8902, 12.4922, "https://loremflickr.com/400/300/colosseum?lock=4"),
+            spot(R.string.hot_sydney_title, R.string.hot_sydney_sub, R.string.hot_sydney_desc,
+                -33.8568, 151.2153, "https://loremflickr.com/400/300/sydneyoperahouse?lock=5"),
+            spot(R.string.hot_shibuya_title, R.string.hot_shibuya_sub, R.string.hot_shibuya_desc,
+                35.6595, 139.7004, "https://loremflickr.com/400/300/shibuya?lock=6"),
+            spot(R.string.hot_goldengate_title, R.string.hot_goldengate_sub, R.string.hot_goldengate_desc,
+                37.8199, -122.4783, "https://loremflickr.com/400/300/goldengatebridge?lock=7"),
+            spot(R.string.hot_sagrada_title, R.string.hot_sagrada_sub, R.string.hot_sagrada_desc,
+                41.4036, 2.1744, "https://loremflickr.com/400/300/sagradafamilia?lock=8")
+        )
+    }
+
     sealed interface ListState {
         data object Idle : ListState
         data object Loading : ListState
         data class Success(val spots: List<StreetViewSpot>) : ListState
         data class Error(val message: String?) : ListState
-    }
-
-    companion object {
-        // "热门街景"没有官方 API，这里内置一份精选的著名地标。
-        // 封面图使用 Wikimedia Commons 的公开图片（缩略图尺寸）。
-        val HOT_SPOTS = listOf(
-            StreetViewSpot(
-                title = "埃菲尔铁塔",
-                subtitle = "法国 · 巴黎",
-                position = LatLng(48.8584, 2.2945),
-                date = null,
-                distanceMeters = null,
-                coverUrl = "https://loremflickr.com/400/300/eiffeltower?lock=1",
-                description = "巴黎的标志性铁塔，塞纳河畔的浪漫地标，俯瞰整座城市。"
-            ),
-            StreetViewSpot(
-                title = "时代广场",
-                subtitle = "美国 · 纽约",
-                position = LatLng(40.7580, -73.9855),
-                date = null,
-                distanceMeters = null,
-                coverUrl = "https://loremflickr.com/400/300/timessquare?lock=2",
-                description = "纽约最繁华的十字路口，霓虹广告与人潮昼夜不息。"
-            ),
-            StreetViewSpot(
-                title = "大本钟",
-                subtitle = "英国 · 伦敦",
-                position = LatLng(51.5007, -0.1246),
-                date = null,
-                distanceMeters = null,
-                coverUrl = "https://loremflickr.com/400/300/bigben?lock=3",
-                description = "威斯敏斯特宫的钟楼，伦敦最具代表性的建筑之一。"
-            ),
-            StreetViewSpot(
-                title = "罗马斗兽场",
-                subtitle = "意大利 · 罗马",
-                position = LatLng(41.8902, 12.4922),
-                date = null,
-                distanceMeters = null,
-                coverUrl = "https://loremflickr.com/400/300/colosseum?lock=4",
-                description = "古罗马的圆形竞技场，两千年历史的恢弘遗迹。"
-            ),
-            StreetViewSpot(
-                title = "悉尼歌剧院",
-                subtitle = "澳大利亚 · 悉尼",
-                position = LatLng(-33.8568, 151.2153),
-                date = null,
-                distanceMeters = null,
-                coverUrl = "https://loremflickr.com/400/300/sydneyoperahouse?lock=5",
-                description = "帆船造型的世界级表演艺术中心，矗立于悉尼港湾。"
-            ),
-            StreetViewSpot(
-                title = "涩谷十字路口",
-                subtitle = "日本 · 东京",
-                position = LatLng(35.6595, 139.7004),
-                date = null,
-                distanceMeters = null,
-                coverUrl = "https://loremflickr.com/400/300/shibuya?lock=6",
-                description = "全球最繁忙的人行横道，东京潮流文化的中心。"
-            ),
-            StreetViewSpot(
-                title = "金门大桥",
-                subtitle = "美国 · 旧金山",
-                position = LatLng(37.8199, -122.4783),
-                date = null,
-                distanceMeters = null,
-                coverUrl = "https://loremflickr.com/400/300/goldengatebridge?lock=7",
-                description = "横跨金门海峡的红色悬索大桥，旧金山的象征。"
-            ),
-            StreetViewSpot(
-                title = "圣家堂",
-                subtitle = "西班牙 · 巴塞罗那",
-                position = LatLng(41.4036, 2.1744),
-                date = null,
-                distanceMeters = null,
-                coverUrl = "https://loremflickr.com/400/300/sagradafamilia?lock=8",
-                description = "高迪未竟的旷世杰作，巴塞罗那的精神地标。"
-            )
-        )
     }
 }

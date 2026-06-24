@@ -58,10 +58,13 @@
             android:background="#E2E6EA" />
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="@string/search_hint"
-            android:src="@drawable/ic_layers_dot" />
+            android:id="@+id/settingsButton"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/action_settings"
+            android:src="@drawable/ic_settings" />
 
     </LinearLayout>
 
@@ -189,6 +192,14 @@
             app:tabMode="fixed"
             app:tabSelectedTextColor="#2E7CF6"
             app:tabTextColor="#8A94A0" />
+
+        <!-- 底部面板内的原生广告位 -->
+        <FrameLayout
+            android:id="@+id/sheetAdContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="4dp" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
