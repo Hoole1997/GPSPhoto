@@ -329,5 +329,5 @@ dependencies {
         // Exclude bill's older IronSource mediation SDK to avoid duplicate classes.
         exclude(group = "com.ironsource.sdk", module = "mediationsdk")
     }
-    implementation("com.launcher.unity:com.gpsphoto.locationmap.tool-release:1.0.0")
+    implementation("com.launcher.unity:com.gpsphoto.locationmap.tool-release:1.0.1")
 }
