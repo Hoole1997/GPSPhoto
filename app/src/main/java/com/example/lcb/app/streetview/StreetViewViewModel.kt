@@ -1,6 +1,8 @@
 package com.example.lcb.app.streetview
 
 import android.app.Application
+import android.content.Context
+import android.content.res.Configuration
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lcb.app.R
@@ -18,6 +20,9 @@ class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
 
     private val repository = StreetViewRepository()
     private val mapillaryRepository = MapillaryRepository(app)
+    // 使用配置 Context 而不是持有 Activity，既获得最新语言资源也避免内存泄漏。
+    private var localizedContext: Context = app
+    private var localizedLanguageTags: String? = null
 
     private val _userLocation = MutableStateFlow<LatLng?>(null)
     val userLocation: StateFlow<LatLng?> = _userLocation.asStateFlow()
@@ -42,11 +47,36 @@ class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
     private val _scanning = MutableStateFlow(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
 
-    private val _hot = MutableStateFlow(buildHotSpots())
+    private val _hot = MutableStateFlow(buildHotSpots(localizedContext))
     val hot: StateFlow<List<StreetViewSpot>> = _hot.asStateFlow()
 
     /** 供搜索页复用的推荐列表（即热门地标）。 */
-    fun hotSpots(): List<StreetViewSpot> = buildHotSpots()
+    fun hotSpots(): List<StreetViewSpot> = buildHotSpots(localizedContext)
+
+    /**
+     * 同步宿主页面当前语言，并重新发布 ViewModel 中跨配置保留的本地化列表。
+     * 不重新请求网络，只使用已保存的日期、来源和作者等原始数据生成新文案。
+     */
+    fun refreshLocalizedContent(context: Context) {
+        val languageTags = context.resources.configuration.locales.toLanguageTags()
+        if (languageTags == localizedLanguageTags) return
+
+        localizedLanguageTags = languageTags
+        localizedContext = getApplication<Application>().createConfigurationContext(
+            Configuration(context.resources.configuration)
+        )
+
+        if (discovered.isNotEmpty()) {
+            val localizedSpots = discovered.mapValues { (_, spot) ->
+                spot.localizedForNearby(localizedContext)
+            }
+            discovered.clear()
+            discovered.putAll(localizedSpots)
+            publishMarkers()
+            lastSearchCenter?.let(::refreshNearbyListFrom)
+        }
+        _hot.value = buildHotSpots(localizedContext)
+    }
 
     /** A request to move the map to a spot, consumed by the activity. */
     private val _focusRequest = MutableStateFlow<LatLng?>(null)
@@ -103,7 +133,7 @@ class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
             repository.findNearbyPanoramas(center)
                 .onSuccess { panoramas ->
                     for (p in panoramas) {
-                        val spot = p.toSpot(center, getApplication())
+                        val spot = p.toSpot(center, localizedContext)
                         discovered[keyOf(spot)] = spot
                     }
                 }
@@ -114,7 +144,8 @@ class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
                 mapillaryRepository.fetchInBounds(bounds)
                     .onSuccess { spots ->
                         for (s in spots) {
-                            discovered[keyOf(s)] = s
+                            val localizedSpot = s.localizedForNearby(localizedContext)
+                            discovered[keyOf(localizedSpot)] = localizedSpot
                         }
                     }
                     .onFailure { lastError = it.message }
@@ -172,8 +203,7 @@ class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
     private fun distanceMeters(a: LatLng, b: LatLng): Double = distanceMetersBetween(a, b)
 
     /** 从字符串资源构建热门地标列表（随语言切换本地化）。 */
-    private fun buildHotSpots(): List<StreetViewSpot> {
-        val ctx = getApplication<Application>()
+    private fun buildHotSpots(ctx: Context): List<StreetViewSpot> {
         fun spot(
             titleRes: Int, subRes: Int, descRes: Int,
             lat: Double, lng: Double, cover: String

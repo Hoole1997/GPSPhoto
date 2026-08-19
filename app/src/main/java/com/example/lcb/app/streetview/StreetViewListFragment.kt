@@ -14,6 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lcb.app.R
+import com.example.lcb.app.utils.throttleFirst
 import kotlinx.coroutines.launch
 
 /**
@@ -22,8 +23,11 @@ import kotlinx.coroutines.launch
 class StreetViewListFragment : Fragment(R.layout.fragment_street_view_list) {
 
     private val viewModel: StreetViewViewModel by activityViewModels()
-    private val nearbyAdapter = StreetViewAdapter { spot -> viewModel.openStreetView(spot) }
-    private val hotAdapter = HotSpotAdapter { spot -> viewModel.openStreetView(spot) }
+    // 两个列表共用同一个点击窗口，快速切点不同 item 也只发出一次打开请求。
+    private val openStreetViewClick =
+        { spot: StreetViewSpot -> viewModel.openStreetView(spot) }.throttleFirst()
+    private val nearbyAdapter = StreetViewAdapter(openStreetViewClick)
+    private val hotAdapter = HotSpotAdapter(openStreetViewClick)
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyView: TextView

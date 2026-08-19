@@ -41,7 +41,9 @@ class LanguageBottomSheet : BottomSheetDialogFragment() {
 
     private fun currentCode(): String {
         val locales = AppCompatDelegate.getApplicationLocales()
-        return if (locales.isEmpty) "" else locales[0]?.language ?: ""
+        val storedCode = if (locales.isEmpty) "" else locales[0]?.language ?: ""
+        // 已移除或不受支持的语言统一回退为“跟随系统”。
+        return AppLanguage.fromCode(storedCode).code
     }
 
     private fun applyLanguage(language: AppLanguage) {

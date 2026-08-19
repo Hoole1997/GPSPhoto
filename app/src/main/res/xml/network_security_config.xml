@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Launcher/广告渠道 SDK 可能使用明文 HTTP 地址。允许系统证书信任链下的
+  HTTP/HTTPS 请求，避免依赖 Manifest 将 usesCleartextTraffic 合并为 false。
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

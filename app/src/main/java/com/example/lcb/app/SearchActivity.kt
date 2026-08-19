@@ -8,8 +8,6 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +18,8 @@ import com.example.lcb.app.streetview.PlaceResult
 import com.example.lcb.app.streetview.PlaceResultAdapter
 import com.example.lcb.app.streetview.RecommendAdapter
 import com.example.lcb.app.streetview.SearchViewModel
+import com.example.lcb.app.utils.AdSlotPositions
+import com.example.lcb.app.utils.applySystemBarInsets
 import com.example.lcb.app.utils.loadNative
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -52,11 +52,8 @@ class SearchActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_search)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.searchRoot)) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, bars.top, 0, bars.bottom)
-            insets
-        }
+        // 普通内容页整体避让状态栏，以及手势/三键导航栏。
+        findViewById<View>(R.id.searchRoot).applySystemBarInsets()
 
         // 接收来自地图的可见区域，用于偏向搜索结果
         val biasBounds = readBiasFromIntent()
@@ -116,7 +113,10 @@ class SearchActivity : AppCompatActivity() {
         searchInput.requestFocus()
 
         // 搜索页空闲态展示一条原生广告（频率自然、不打扰搜索）
-        loadNative(container = findViewById(R.id.adContainer))
+        loadNative(
+            positionName = AdSlotPositions.NA_SEARCH_IDLE_BOTTOM,
+            container = findViewById(R.id.adContainer)
+        )
     }
 
     private fun observeState() {
@@ -128,47 +128,41 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun render(state: SearchViewModel.SearchState) {
+        // 所有搜索状态共享同一个 FrameLayout；切换前先关闭全部状态层，保证任意
+        // 状态迁移（尤其是“结果 → 清空输入”）都只会留下一个可见内容层。
+        hideAllContentLayers()
+
         when (state) {
             is SearchViewModel.SearchState.History -> {
-                showIdle(true)
-                loading.visibility = View.GONE
-                stateText.visibility = View.GONE
+                idleContainer.visibility = View.VISIBLE
                 historyAdapter.submitList(state.items)
                 historyHeader.visibility = if (state.items.isEmpty()) View.GONE else View.VISIBLE
                 historyList.visibility = if (state.items.isEmpty()) View.GONE else View.VISIBLE
             }
             SearchViewModel.SearchState.Loading -> {
-                showIdle(false)
-                resultList.visibility = View.GONE
-                stateText.visibility = View.GONE
                 loading.visibility = View.VISIBLE
             }
             is SearchViewModel.SearchState.Results -> {
-                showIdle(false)
-                loading.visibility = View.GONE
-                stateText.visibility = View.GONE
                 resultList.visibility = View.VISIBLE
                 resultAdapter.submitList(state.items)
             }
             SearchViewModel.SearchState.Empty -> {
-                showIdle(false)
-                resultList.visibility = View.GONE
-                loading.visibility = View.GONE
                 stateText.visibility = View.VISIBLE
                 stateText.text = getString(R.string.search_no_result)
             }
             is SearchViewModel.SearchState.Error -> {
-                showIdle(false)
-                resultList.visibility = View.GONE
-                loading.visibility = View.GONE
                 stateText.visibility = View.VISIBLE
                 stateText.text = state.message ?: getString(R.string.search_error)
             }
         }
     }
 
-    private fun showIdle(show: Boolean) {
-        idleContainer.visibility = if (show) View.VISIBLE else View.GONE
+    /** 重置互斥内容层，避免上一个搜索状态残留在当前状态上方。 */
+    private fun hideAllContentLayers() {
+        idleContainer.visibility = View.GONE
+        resultList.visibility = View.GONE
+        stateText.visibility = View.GONE
+        loading.visibility = View.GONE
     }
 
     private fun onPlaceChosen(place: PlaceResult) {

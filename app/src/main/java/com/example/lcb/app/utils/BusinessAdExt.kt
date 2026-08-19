@@ -7,9 +7,12 @@ import androidx.lifecycle.lifecycleScope
 import com.android.common.bill.ads.AdResult
 import com.android.common.bill.ads.ext.AdShowExt
 import com.android.common.bill.ui.NativeAdStyleType
+import com.example.lcb.app.LauncherSdkGateway
 import kotlinx.coroutines.launch
+import net.corekit.core.controller.AdSlotSwitchController
 
 fun FragmentActivity.loadNative(
+    positionName: String,
     container: ViewGroup,
     styleType: NativeAdStyleType = NativeAdStyleType.STANDARD,
     condition: () -> Boolean = { true },
@@ -17,7 +20,7 @@ fun FragmentActivity.loadNative(
 ) {
     lifecycleScope.launch {
         try {
-            if (!condition.invoke()) {
+            if (!condition.invoke() || !isAdSlotEnabled(positionName)) {
                 container.visibility = View.GONE
                 call.invoke(false)
                 return@launch
@@ -44,16 +47,19 @@ fun FragmentActivity.loadNative(
 }
 
 fun FragmentActivity.loadInterstitial(
+    positionName: String,
     condition: () -> Boolean = { true },
     call: (Boolean) -> Unit
 ) {
     lifecycleScope.launch {
         try {
-            if (!condition.invoke()) {
+            if (!condition.invoke() || !isAdSlotEnabled(positionName)) {
                 call.invoke(false)
                 return@launch
             }
 
+            // Local 渠道在插屏展示前通知 Launcher SDK；Google 渠道注册为空操作。
+            LauncherSdkGateway.beforeShowAd(this@loadInterstitial)
             when (AdShowExt.showInterstitialAd(this@loadInterstitial)) {
                 is AdResult.Success -> call.invoke(true)
                 is AdResult.Failure -> call.invoke(false)
@@ -62,4 +68,9 @@ fun FragmentActivity.loadInterstitial(
             call.invoke(false)
         }
     }
+}
+
+private fun isAdSlotEnabled(positionName: String): Boolean {
+    // Switch lookup stays outside SDK ad loading so disabled slots skip all ad requests.
+    return AdSlotSwitchController.isEnabled(positionName)
 }

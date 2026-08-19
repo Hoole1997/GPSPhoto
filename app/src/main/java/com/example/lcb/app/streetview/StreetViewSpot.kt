@@ -29,6 +29,32 @@ data class StreetViewSpot(
 
 enum class StreetViewSource { GOOGLE, MAPILLARY }
 
+/**
+ * 根据当前语言重新生成附近街景的展示文本，同时保留接口返回的原始字段。
+ * Activity 因语言切换重建时 ViewModel 仍会保留，因此不能只在首次搜索时本地化。
+ */
+fun StreetViewSpot.localizedForNearby(context: Context): StreetViewSpot {
+    return when (source) {
+        StreetViewSource.GOOGLE -> copy(
+            title = context.getString(R.string.street_view_marker_title),
+            subtitle = date?.let { context.getString(R.string.sv_date_prefix, it) }
+                ?: context.getString(R.string.sv_date_unknown)
+        )
+        StreetViewSource.MAPILLARY -> copy(
+            title = context.getString(
+                if (isPano) R.string.mapillary_pano_title else R.string.mapillary_street_title
+            ),
+            subtitle = buildString {
+                append(
+                    context.getString(if (isPano) R.string.sv_pano else R.string.sv_street)
+                )
+                date?.let { append(" · $it") }
+                creator?.let { append(" · @$it") }
+            }
+        )
+    }
+}
+
 fun StreetViewPanorama.toSpot(origin: LatLng, context: Context): StreetViewSpot {
     val distance = haversineMeters(origin, position)
     return StreetViewSpot(
@@ -39,7 +65,7 @@ fun StreetViewPanorama.toSpot(origin: LatLng, context: Context): StreetViewSpot 
         date = date,
         distanceMeters = distance,
         panoId = panoId
-    )
+    ).localizedForNearby(context)
 }
 
 private fun haversineMeters(a: LatLng, b: LatLng): Double {

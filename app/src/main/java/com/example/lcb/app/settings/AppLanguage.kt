@@ -1,5 +1,7 @@
 package com.example.lcb.app.settings
 
+import java.util.Locale
+
 /**
  * Supported app languages (mainstream + populous countries).
  * [code] is a BCP-47 language tag used with AppCompatDelegate locales;
@@ -22,13 +24,16 @@ enum class AppLanguage(
     JAPANESE("ja", "Japanese", "日本語", "🇯🇵"),
     GERMAN("de", "German", "Deutsch", "🇩🇪"),
     FRENCH("fr", "French", "Français", "🇫🇷"),
-    INDONESIAN("in", "Indonesian", "Bahasa Indonesia", "🇮🇩"),
     KOREAN("ko", "Korean", "한국어", "🇰🇷");
 
     companion object {
         fun fromCode(code: String?): AppLanguage {
             if (code.isNullOrEmpty()) return SYSTEM
-            return entries.firstOrNull { it.code == code } ?: SYSTEM
+            val languageCode = code
+                .substringBefore('-')
+                .substringBefore('_')
+                .lowercase(Locale.ROOT)
+            return entries.firstOrNull { it.code == languageCode } ?: SYSTEM
         }
     }
 }

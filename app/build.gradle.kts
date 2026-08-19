@@ -323,11 +323,14 @@ dependencies {
 //    implementation(project(":bill"))
 //    implementation(project(":core"))
     implementation(project(":metrics"))
-    implementation("com.github.toukaremax:core:1.0.11")
-    implementation("com.github.toukaremax:bill:1.0.31") {
+    implementation("com.github.toukaremax:core:1.0.15")
+    implementation("com.github.toukaremax:bill:1.0.48") {
         // Launcher SDK provides com.unity3d.ads-mediation:mediation-sdk:9.2.0.
         // Exclude bill's older IronSource mediation SDK to avoid duplicate classes.
         exclude(group = "com.ironsource.sdk", module = "mediationsdk")
     }
-    implementation("com.launcher.unity:com.gpsphoto.locationmap.tool-release:1.0.1")
+    // Launcher SDK 含同包名混淆类，必须按渠道隔离，不能进入 main/implementation。
+    // 正式 SDK 坐标后续只替换 googleImplementation，不影响 Local 编译与映射。
+    add("googleImplementation", "com.launcher.unity:com.gpsphoto.locationmap.tool-release:1.0.2")
+    add("localImplementation", "com.launcher.unity:com.leafmotivation.quizguessoncolor-GPSPhoto:1.0.2")
 }

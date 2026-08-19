@@ -32,7 +32,11 @@ class PlaceResultAdapter(
 
         fun bind(place: PlaceResult) {
             name.text = place.name
-            address.text = place.address
+            val detailAddress = place.address.trim()
+            // 无二级地址时移除整行及其间距，让单行标题与左侧图标自然垂直居中。
+            // 每次绑定都显式恢复 visibility，避免 RecyclerView 复用造成显示状态串行。
+            address.visibility = if (detailAddress.isEmpty()) View.GONE else View.VISIBLE
+            address.text = detailAddress
             icon.setImageResource(if (isHistory) R.drawable.ic_history else R.drawable.ic_place)
             itemView.setOnClickListener { onClick(place) }
         }

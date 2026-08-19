@@ -11,16 +11,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.example.lcb.app.streetview.StreetViewPagerAdapter
 import com.example.lcb.app.streetview.StreetViewViewModel
+import com.example.lcb.app.utils.AdSlotPositions
+import com.example.lcb.app.utils.applySystemBarInsets
 import com.example.lcb.app.utils.loadInterstitial
 import com.example.lcb.app.utils.loadNative
+import com.example.lcb.app.utils.throttleFirst
+import com.example.lcb.app.utils.updateTopMarginForInset
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -44,6 +46,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
     private val cancellationTokenSource = CancellationTokenSource()
     private val viewModel: StreetViewViewModel by viewModels()
+    // marker 点击和最终 Activity 启动分别防重；后者覆盖所有进入街景页的入口。
+    private val openStreetViewFromMapClick =
+        { spot: com.example.lcb.app.streetview.StreetViewSpot ->
+            viewModel.openStreetView(spot)
+        }.throttleFirst()
+    private val launchStreetView =
+        { intent: android.content.Intent -> openStreetViewWithAd(intent) }.throttleFirst()
 
     private var googleMap: GoogleMap? = null
     private var clusterManager:
@@ -96,28 +105,31 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main_home)
+        // ViewModel 会跨语言配置变更保留，需用新 Activity 的资源重建列表展示文本。
+        viewModel.refreshLocalizedContent(this)
         // 全屏沉浸：地图铺满整屏（延伸到状态栏/导航栏下）。
         // 给搜索框让出状态栏高度；并把底部面板高度限制为"搜索框下方到屏幕底部"，
         // 这样面板展开时正好停在搜索框下，且只有 收起/展开 两档，无中间停顿。
+        val mainRoot = findViewById<android.view.View>(R.id.main)
         val searchBar = findViewById<android.view.View>(R.id.searchBar)
         val bottomSheet = findViewById<android.view.View>(R.id.bottomSheet)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { root, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            (searchBar.layoutParams as? android.view.ViewGroup.MarginLayoutParams)?.let { lp ->
-                lp.topMargin = bars.top + dp(12)
-                searchBar.layoutParams = lp
-            }
+        mainRoot.applySystemBarInsets(
+            padStatusBarTop = false,
+            padNavigationBars = false
+        ) { systemBars ->
+            searchBar.updateTopMarginForInset(systemBars.statusBarTop, dp(12))
             // 面板顶部上限 = 状态栏 + 搜索框上间距 + 搜索框高度 + 搜索框下间距
-            val sheetTopLimit = bars.top + dp(12) + dp(52) + dp(12)
-            val sheetHeight = root.height - sheetTopLimit
+            val sheetTopLimit = systemBars.statusBarTop + dp(12) + dp(52) + dp(12)
+            val sheetHeight = mainRoot.height - sheetTopLimit
             if (sheetHeight > 0 && bottomSheet.layoutParams.height != sheetHeight) {
                 bottomSheet.layoutParams = bottomSheet.layoutParams.apply {
                     height = sheetHeight
                 }
             }
-            // 列表底部留出导航栏高度，避免最后一项被导航栏遮挡
-            viewModel.setListBottomInset(bars.bottom + dp(8))
-            insets
+            // 收起态在导航栏上方保留完整的 80dp 面板，展开态列表也避让导航栏。
+            com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet).peekHeight =
+                dp(80) + systemBars.navigationBarBottom
+            viewModel.setListBottomInset(systemBars.navigationBarBottom + dp(8))
         }
 
         setupBottomSheet()
@@ -156,7 +168,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         observeViewModel()
 
         // 底部面板内原生广告
-        loadNative(container = findViewById(R.id.sheetAdContainer))
+        loadNative(
+            positionName = AdSlotPositions.NA_HOME_BOTTOM,
+            container = findViewById(R.id.sheetAdContainer)
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 兼容主页面未被系统立即重建、从设置页返回后才取得新语言的情况。
+        viewModel.refreshLocalizedContent(this)
     }
 
     private fun setupZoomSlider() {
@@ -291,7 +312,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                                 mapillaryId = spot.mapillaryId
                             )
                             viewModel.consumeOpenStreetView()
-                            openStreetViewWithAd(intent)
+                            launchStreetView(intent)
                         }
                     }
                 }
@@ -458,7 +479,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         manager.renderer = com.example.lcb.app.streetview.StreetViewClusterRenderer(this, map, manager)
         // 点击单个街景点 → 打开全屏街景
         manager.setOnClusterItemClickListener { item ->
-            viewModel.openStreetView(item.spot)
+            openStreetViewFromMapClick(item.spot)
             true
         }
         // 点击聚合点 → 放大地图展开
@@ -623,7 +644,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun openStreetViewWithAd(intent: android.content.Intent) {
         if (com.example.lcb.app.utils.AdGate.shouldShowOnStreetViewOpen()) {
-            loadInterstitial(condition = { true }) { shown: Boolean ->
+            loadInterstitial(
+                positionName = AdSlotPositions.IV_STREET_VIEW_ENTRY,
+                condition = { true }
+            ) { shown: Boolean ->
                 if (shown) com.example.lcb.app.utils.AdGate.markInterstitialShown()
                 startActivity(intent)
             }
@@ -646,7 +670,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onBackPressed() {
-        LcbApp.backLaunchActivity()
+        LauncherSdkGateway.returnToLauncher()
     }
 
     companion object {

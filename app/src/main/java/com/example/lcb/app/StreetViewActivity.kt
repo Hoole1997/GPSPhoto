@@ -2,11 +2,14 @@ package com.example.lcb.app
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.net.http.SslError
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.SslErrorHandler
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
@@ -14,8 +17,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.example.lcb.app.utils.applySystemBarInsets
+import com.example.lcb.app.utils.updateTopMarginForInset
 
 /**
  * Full-screen immersive Street View viewer backed by the Maps Embed API
@@ -33,6 +36,10 @@ class StreetViewActivity : AppCompatActivity() {
     private var embedUrl: String = ""
     private var isMapillary: Boolean = false
     private var mapillaryId: String? = null
+    private val showContentRunnable = Runnable {
+        // iframe 可能晚于外层 HTML 失败，执行延迟任务前必须再次确认加载状态。
+        if (!pageFailed && !isFinishing && !isDestroyed) showContent()
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,19 +54,7 @@ class StreetViewActivity : AppCompatActivity() {
         titleBar = findViewById(R.id.titleBar)
 
         val backButton = findViewById<ImageView>(R.id.backButton)
-        // 返回按钮避让状态栏
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.streetViewRoot)) { _, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            (backButton.layoutParams as? android.view.ViewGroup.MarginLayoutParams)?.let {
-                it.topMargin = bars.top + dp(8)
-                backButton.layoutParams = it
-            }
-            (titleBar.layoutParams as? android.view.ViewGroup.MarginLayoutParams)?.let {
-                it.topMargin = bars.top + dp(8)
-                titleBar.layoutParams = it
-            }
-            insets
-        }
+        configureSystemBarInsets(backButton)
 
         backButton.setOnClickListener { finish() }
         findViewById<TextView>(R.id.retryButton).setOnClickListener { reload() }
@@ -79,6 +74,21 @@ class StreetViewActivity : AppCompatActivity() {
         embedUrl = buildEmbedUrl(lat, lng, pano)
         setupWebView()
         reload()
+    }
+
+    /**
+     * 统一处理街景页的系统栏安全区。
+     *
+     * 页面保持 edge-to-edge：顶部浮层通过 margin 避让状态栏，街景内容则通过根容器
+     * padding 避让底部/侧边导航栏。导航栏 inset 由系统按手势导航或三键导航动态提供，
+     * 避免在不同设备形态下使用固定高度造成内容遮挡。
+     */
+    private fun configureSystemBarInsets(backButton: View) {
+        val root = findViewById<View>(R.id.streetViewRoot)
+        root.applySystemBarInsets(padStatusBarTop = false) { systemBars ->
+            backButton.updateTopMarginForInset(systemBars.statusBarTop, dp(8))
+            titleBar.updateTopMarginForInset(systemBars.statusBarTop, dp(8))
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -115,8 +125,7 @@ class StreetViewActivity : AppCompatActivity() {
             }
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
-                pageFailed = false
-                showLoading()
+                if (!pageFailed) showLoading()
             }
 
             override fun onReceivedError(
@@ -124,18 +133,34 @@ class StreetViewActivity : AppCompatActivity() {
                 request: WebResourceRequest?,
                 error: WebResourceError?
             ) {
-                // 仅主框架失败才算整体失败
-                if (request?.isForMainFrame == true) {
-                    pageFailed = true
-                    showError()
-                }
+                // 街景在 iframe/脚本中加载，子资源失败也统一显示应用错误页。
+                handleWebViewLoadFailure()
+            }
+
+            override fun onReceivedHttpError(
+                view: WebView?,
+                request: WebResourceRequest?,
+                errorResponse: WebResourceResponse?
+            ) {
+                handleWebViewLoadFailure()
+            }
+
+            override fun onReceivedSslError(
+                view: WebView?,
+                handler: SslErrorHandler?,
+                error: SslError?
+            ) {
+                // SSL 加载失败不继续绕过证书校验，直接进入统一错误页。
+                handler?.cancel()
+                handleWebViewLoadFailure()
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 if (!pageFailed) {
                     // 外层 HTML 加载完成后，iframe 内的街景仍在渲染，
                     // 留出时间让全景出现，避免过早移除 loading 露出黑屏
-                    view?.postDelayed({ showContent() }, 900)
+                    webView.removeCallbacks(showContentRunnable)
+                    webView.postDelayed(showContentRunnable, CONTENT_REVEAL_DELAY_MILLIS)
                 }
             }
         }
@@ -173,13 +198,13 @@ class StreetViewActivity : AppCompatActivity() {
     }
 
     private fun reload() {
+        beginWebViewLoad()
         if (isMapillary) {
             val id = mapillaryId
             if (id.isNullOrBlank()) {
-                showError()
+                handleWebViewLoadFailure()
                 return
             }
-            showLoading()
             webView.loadDataWithBaseURL(
                 "https://www.mapillary.com",
                 buildMapillaryHtml(id),
@@ -191,10 +216,9 @@ class StreetViewActivity : AppCompatActivity() {
         }
 
         if (embedUrl.isBlank()) {
-            showError()
+            handleWebViewLoadFailure()
             return
         }
-        showLoading()
         // 用一个全屏 HTML 包裹 iframe 来承载 Embed 街景，
         // 直接把 embed URL 作为顶层文档加载在 WebView 里可能渲染异常（黑屏）。
         webView.loadDataWithBaseURL(
@@ -262,13 +286,34 @@ class StreetViewActivity : AppCompatActivity() {
         """.trimIndent()
     }
 
+    /** 开始一次全新的加载，清除上次失败及延迟显示任务。 */
+    private fun beginWebViewLoad() {
+        webView.removeCallbacks(showContentRunnable)
+        pageFailed = false
+        showLoading()
+    }
+
+    /** 所有 WebView 加载错误统一收口到应用自己的默认错误页。 */
+    private fun handleWebViewLoadFailure() {
+        if (pageFailed) return
+        pageFailed = true
+        webView.removeCallbacks(showContentRunnable)
+        webView.stopLoading()
+        showError()
+    }
+
     private fun showLoading() {
+        loadingOverlay.animate().cancel()
+        loadingOverlay.alpha = 1f
+        webView.visibility = View.VISIBLE
         loadingOverlay.visibility = View.VISIBLE
         errorOverlay.visibility = View.GONE
         loadingProgress.progress = 0
     }
 
     private fun showContent() {
+        if (pageFailed) return
+        webView.visibility = View.VISIBLE
         loadingOverlay.animate().alpha(0f).setDuration(250).withEndAction {
             loadingOverlay.visibility = View.GONE
             loadingOverlay.alpha = 1f
@@ -277,7 +322,11 @@ class StreetViewActivity : AppCompatActivity() {
     }
 
     private fun showError() {
+        loadingOverlay.animate().cancel()
+        loadingOverlay.alpha = 1f
         loadingOverlay.visibility = View.GONE
+        // 隐藏 WebView，避免系统原生错误页在覆盖层切换期间闪现。
+        webView.visibility = View.INVISIBLE
         errorOverlay.visibility = View.VISIBLE
     }
 
@@ -324,6 +373,7 @@ class StreetViewActivity : AppCompatActivity() {
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     override fun onDestroy() {
+        webView.removeCallbacks(showContentRunnable)
         webView.destroy()
         super.onDestroy()
     }
@@ -335,6 +385,7 @@ class StreetViewActivity : AppCompatActivity() {
         const val EXTRA_TITLE = "extra_title"
         const val EXTRA_IS_MAPILLARY = "extra_is_mapillary"
         const val EXTRA_MAPILLARY_ID = "extra_mapillary_id"
+        private const val CONTENT_REVEAL_DELAY_MILLIS = 900L
 
         fun newIntent(
             context: android.content.Context,

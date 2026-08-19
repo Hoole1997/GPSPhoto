@@ -6,8 +6,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.example.lcb.app.utils.applySystemBarInsets
 
 class AboutActivity : AppCompatActivity() {
 
@@ -16,11 +15,8 @@ class AboutActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_about)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.aboutRoot)) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, bars.top, 0, bars.bottom)
-            insets
-        }
+        // 普通内容页整体避让状态栏，以及手势/三键导航栏。
+        findViewById<View>(R.id.aboutRoot).applySystemBarInsets()
 
         findViewById<View>(R.id.backButton).setOnClickListener { finish() }
 

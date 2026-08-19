@@ -7,10 +7,10 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.lcb.app.settings.AppLanguage
 import com.example.lcb.app.settings.LanguageBottomSheet
+import com.example.lcb.app.utils.AdSlotPositions
+import com.example.lcb.app.utils.applySystemBarInsets
 import com.example.lcb.app.utils.loadNative
 
 class SettingsActivity : AppCompatActivity() {
@@ -22,11 +22,8 @@ class SettingsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settingsRoot)) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, bars.top, 0, bars.bottom)
-            insets
-        }
+        // 普通内容页整体避让状态栏，以及手势/三键导航栏。
+        findViewById<View>(R.id.settingsRoot).applySystemBarInsets()
 
         findViewById<View>(R.id.backButton).setOnClickListener { finish() }
 
@@ -44,7 +41,10 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // 设置页底部原生广告
-        loadNative(container = findViewById(R.id.adContainer))
+        loadNative(
+            positionName = AdSlotPositions.NA_SETTINGS_BOTTOM,
+            container = findViewById(R.id.adContainer)
+        )
     }
 
     private fun updateLanguageValue() {

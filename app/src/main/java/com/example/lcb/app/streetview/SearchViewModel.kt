@@ -26,6 +26,7 @@ class SearchViewModel(app: Application) : AndroidViewModel(app) {
     val recommendations: List<StreetViewSpot> = buildRecommendations(app)
 
     private var searchJob: Job? = null
+    private var latestQuery: String = ""
     private var viewBias: LatLngBounds? = null
 
     fun setBias(bounds: LatLngBounds?) {
@@ -34,7 +35,9 @@ class SearchViewModel(app: Application) : AndroidViewModel(app) {
 
     fun onQueryChanged(raw: String) {
         val query = raw.trim()
+        latestQuery = query
         searchJob?.cancel()
+        searchJob = null
         if (query.isEmpty()) {
             _state.value = SearchState.History(loadHistory())
             return
@@ -42,7 +45,11 @@ class SearchViewModel(app: Application) : AndroidViewModel(app) {
         searchJob = viewModelScope.launch {
             delay(450) // 防抖，遵守 Nominatim ~1 req/s
             _state.value = SearchState.Loading
-            repository.search(query, viewBias)
+            val result = repository.search(query, viewBias)
+            // HttpURLConnection 是阻塞调用；即使旧请求未及时响应协程取消，也不能让
+            // 它在输入已清空或变更后覆盖最新的页面状态。
+            if (query != latestQuery) return@launch
+            result
                 .onSuccess { list ->
                     _state.value = if (list.isEmpty()) SearchState.Empty else SearchState.Results(list)
                 }
