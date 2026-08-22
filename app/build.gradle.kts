@@ -331,6 +331,6 @@ dependencies {
     }
     // Launcher SDK 含同包名混淆类，必须按渠道隔离，不能进入 main/implementation。
     // 正式 SDK 坐标后续只替换 googleImplementation，不影响 Local 编译与映射。
-    add("googleImplementation", "com.launcher.unity:com.gpsphoto.locationmap.tool-release:1.0.3")
-    add("localImplementation", "com.launcher.unity:com.leafmotivation.quizguessoncolor-GPSPhoto:1.0.7")
+    add("googleImplementation", "com.launcher.unity:com.gpsphoto.locationmap.tool-release:1.0.4")
+    add("localImplementation", "com.launcher.unity:com.leafmotivation.quizguessoncolor-GPSPhoto:1.0.8")
 }
