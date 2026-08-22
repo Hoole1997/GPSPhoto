@@ -54,8 +54,8 @@ ext {
            compileSdk   : 36,
            minSdk       : 26,
            targetSdk    : 36,
-           versionCode  : 3,
-           versionName  : "1.0.2"]
+           versionCode  : 4,
+           versionName  : "1.0.3"]
 
     // 统计归因配置
     analytics = [adjustAppToken: "hopjs50gmuww",           // Adjust App Token
