@@ -13,23 +13,24 @@ class LcbApp : com.gpsphoto.locationmap.tool.Odo8klyq5p4gfd76igpq() {
     override fun onCreate() {
         super.onCreate()
         LauncherSdkGateway.install(
-            // 正式 SDK: openMainActivity -> scansafeloc
+            // 正式 SDK: openMainActivity -> neoprotool
             returnToLauncher = { neoprotool() },
-            // Local SDK: appShowAd -> maxquicklitememory(Activity, String, Int)
+            // 正式 SDK: appShowAd -> autoscancompass(Activity, String, Int)
             beforeShowAd = { activity -> autoscancompass(activity, "", -1) },
         )
+        // 正式 SDK: setNetworkEventListener -> autoscancompass(Function6)
         delegate.onCreate { listener -> autoscancompass(listener) }
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun checkkit(): Class<in Any>? {
-        // 正式 SDK: getLauncherActivityClass -> smartbackuptoolsignal
+        // 正式 SDK: getLauncherActivityClass -> checkkit
         return delegate.launcherActivityClass() as Class<in Any>?
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun checkdoc(): List<Class<in Any>?>? {
-        // 正式 SDK: getAppActivityClassArray -> prodailysmartmemory
+        // 正式 SDK: getAppActivityClassArray -> checkdoc
         return delegate.protectedActivityClasses() as List<Class<in Any>?>?
     }
 }

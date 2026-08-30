@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-30T14:38:30.692465Z",
+  "packageName": "com.gpsphoto.locationmap.tool",
+  "sdkBranch": "v2.0.3.1",
+  "artifactIdSuffix": "release",
+  "jenkinsBuildNumber": 1833,
+  "dependency": "com.launcher.unity:com.gpsphoto.locationmap.tool-release:1.0.7",
+  "aarSha256": "6b58293a536ce86b97da4aec349371ad1b5ba37a2d8acbc8cee6bfa29da419fa",
+  "classMapping": {
+    "source": "org.oksp.launcher.App",
+    "target": "com.gpsphoto.locationmap.tool.Odo8klyq5p4gfd76igpq"
+  },
+  "methodMappings": {
+    "appShowAd": "autoscancompass",
+    "setNetworkEventListener": "autoscancompass",
+    "openMainActivity": "neoprotool",
+    "getAppActivityClassArray": "checkdoc",
+    "getLauncherActivityClass": "checkkit"
+  },
+  "verification": {
+    "aarBytecode": true,
+    "mappingFile": true
+  },
+  "integration": {
+    "mappingSourceFile": "app/src/google/java/com/example/lcb/app/LcbApp.kt",
+    "dependencyFile": "app/build.gradle.kts",
+    "channel": "google"
+  }
+}
