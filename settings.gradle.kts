@@ -34,12 +34,28 @@ dependencyResolutionManagement {
         maven("https://jitpack.io")
         maven("https://artifact.bytedance.com/repository/pangle/")
         maven("https://repo.itextsupport.com/android")
-        maven("https://repo.dgtverse.cn/repository/maven-public/")
+        // Chartboost 的不同 SDK 分别发布在各自的官方仓库。
+        maven("https://cboost.jfrog.io/artifactory/chartboost-ads") {
+            content { includeModule("com.chartboost", "chartboost-sdk") }
+        }
+        maven("https://cboost.jfrog.io/artifactory/chartboost-core") {
+            content { includeModule("com.chartboost", "chartboost-core-sdk") }
+        }
+        maven("https://cboost.jfrog.io/artifactory/chartboost-mediation") {
+            content {
+                includeModule("com.chartboost", "chartboost-mediation-sdk")
+                includeModule("com.chartboost", "chartboost-mediation-adapter-chartboost")
+            }
+        }
+        maven("https://repo.dgtverse.cn/repository/maven-public/") {
+            content { excludeGroup("com.chartboost") }
+        }
         maven("https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea")
         maven("https://android-sdk.is.com/")
         maven("https://jfrog.anythinktech.com/artifactory/overseas_sdk")
-        maven("https://artifacts.applovin.com/android")
-        maven("https://repo.dgtverse.cn/repository/maven-public")
+        maven("https://artifacts.applovin.com/android") {
+            content { excludeGroup("com.chartboost") }
+        }
         maven {
             url = uri("https://maven.pkg.github.com/toukaRemax/remax_sdk")
             credentials {
