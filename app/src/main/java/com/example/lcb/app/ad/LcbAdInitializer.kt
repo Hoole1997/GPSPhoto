@@ -17,6 +17,7 @@ import com.android.common.bill.BillConfig.pangleNativeRenderer
 import com.android.common.bill.BillConfig.topon
 import com.android.common.bill.BillConfig.toponFullScreenNativeRenderer
 import com.android.common.bill.BillConfig.toponNativeRenderer
+import com.android.common.bill.ads.PreloadController
 import com.android.common.bill.ads.bidding.AppOpenBiddingInitializer
 import com.android.common.bill.ui.NativeAdStyle
 import com.android.common.bill.ui.pangle.PangleNativeAdStyle
@@ -46,6 +47,7 @@ object LcbAdInitializer {
         appScope.launch {
             runCatching {
                 AppOpenBiddingInitializer.initialize(application, R.mipmap.ic_launcher) {
+                    externallyInitialized = true
                     googleMobileAds = BillConfig.GoogleMobileAdsConfig(
                         applicationId = BuildConfig.ADMOB_APPLICATION_ID
                     )
@@ -110,6 +112,8 @@ object LcbAdInitializer {
                     toponFullScreenNativeRenderer = DefaultToponFullScreenNativeAdRenderer()
                     adLoadingDialogRenderer = DefaultAdLoadingDialogRenderer()
                 }
+                PreloadController.preloadAll(application)
+
             }.onFailure { throwable ->
                 Log.e(TAG, "Failed to initialize ads", throwable)
             }

@@ -47,11 +47,11 @@ class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
     private val _scanning = MutableStateFlow(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
 
-    private val _hot = MutableStateFlow(buildHotSpots(localizedContext))
+    private val _hot = MutableStateFlow(HotSpotCatalog.build(localizedContext))
     val hot: StateFlow<List<StreetViewSpot>> = _hot.asStateFlow()
 
     /** 供搜索页复用的推荐列表（即热门地标）。 */
-    fun hotSpots(): List<StreetViewSpot> = buildHotSpots(localizedContext)
+    fun hotSpots(): List<StreetViewSpot> = HotSpotCatalog.build(localizedContext)
 
     /**
      * 同步宿主页面当前语言，并重新发布 ViewModel 中跨配置保留的本地化列表。
@@ -75,7 +75,7 @@ class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
             publishMarkers()
             lastSearchCenter?.let(::refreshNearbyListFrom)
         }
-        _hot.value = buildHotSpots(localizedContext)
+        _hot.value = HotSpotCatalog.build(localizedContext)
     }
 
     /** A request to move the map to a spot, consumed by the activity. */
@@ -201,40 +201,6 @@ class StreetViewViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun distanceMeters(a: LatLng, b: LatLng): Double = distanceMetersBetween(a, b)
-
-    /** 从字符串资源构建热门地标列表（随语言切换本地化）。 */
-    private fun buildHotSpots(ctx: Context): List<StreetViewSpot> {
-        fun spot(
-            titleRes: Int, subRes: Int, descRes: Int,
-            lat: Double, lng: Double, cover: String
-        ) = StreetViewSpot(
-            title = ctx.getString(titleRes),
-            subtitle = ctx.getString(subRes),
-            position = LatLng(lat, lng),
-            date = null,
-            distanceMeters = null,
-            coverUrl = cover,
-            description = ctx.getString(descRes)
-        )
-        return listOf(
-            spot(R.string.hot_eiffel_title, R.string.hot_eiffel_sub, R.string.hot_eiffel_desc,
-                48.8584, 2.2945, "https://loremflickr.com/400/300/eiffeltower?lock=1"),
-            spot(R.string.hot_times_title, R.string.hot_times_sub, R.string.hot_times_desc,
-                40.7580, -73.9855, "https://loremflickr.com/400/300/timessquare?lock=2"),
-            spot(R.string.hot_bigben_title, R.string.hot_bigben_sub, R.string.hot_bigben_desc,
-                51.5007, -0.1246, "https://loremflickr.com/400/300/bigben?lock=3"),
-            spot(R.string.hot_colosseum_title, R.string.hot_colosseum_sub, R.string.hot_colosseum_desc,
-                41.8902, 12.4922, "https://loremflickr.com/400/300/colosseum?lock=4"),
-            spot(R.string.hot_sydney_title, R.string.hot_sydney_sub, R.string.hot_sydney_desc,
-                -33.8568, 151.2153, "https://loremflickr.com/400/300/sydneyoperahouse?lock=5"),
-            spot(R.string.hot_shibuya_title, R.string.hot_shibuya_sub, R.string.hot_shibuya_desc,
-                35.6595, 139.7004, "https://loremflickr.com/400/300/shibuya?lock=6"),
-            spot(R.string.hot_goldengate_title, R.string.hot_goldengate_sub, R.string.hot_goldengate_desc,
-                37.8199, -122.4783, "https://loremflickr.com/400/300/goldengatebridge?lock=7"),
-            spot(R.string.hot_sagrada_title, R.string.hot_sagrada_sub, R.string.hot_sagrada_desc,
-                41.4036, 2.1744, "https://loremflickr.com/400/300/sagradafamilia?lock=8")
-        )
-    }
 
     sealed interface ListState {
         data object Idle : ListState

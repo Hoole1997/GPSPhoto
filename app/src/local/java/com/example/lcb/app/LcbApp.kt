@@ -12,8 +12,8 @@ class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
     override fun onCreate() {
         super.onCreate()
         LauncherSdkGateway.install(
-            // Local SDK: openMainActivity -> prodailysmartmemory
-            returnToLauncher = { localproshield() },
+            // Local SDK: openMainActivity -> metaautovault
+            returnToLauncher = { metaautovault() },
             // Local SDK: appShowAd -> maxquicklitememory(Activity, String, Int)
             beforeShowAd = { activity -> maxquicklitememory(activity, "", -1) },
         )
@@ -22,14 +22,14 @@ class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun ultrasafecorehub(): Class<in Any>? {
-        // Local SDK: getLauncherActivityClass -> metaautovault
+    override fun convertsafepower(): Class<in Any>? {
+        // Local SDK: getLauncherActivityClass -> convertsafepower
         return delegate.launcherActivityClass() as Class<in Any>?
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun prodailysmartmemory(): List<Class<in Any>?>? {
-        // Local SDK: getAppActivityClassArray -> convertsafepower
-        return delegate.protectedActivityClasses() as List<Class<in Any>?>?
+    override fun neolitelitepanel(): List<Class<Any>> {
+        // Local SDK: getAppActivityClassArray -> neolitelitepanel
+        return delegate.protectedActivityClasses() as List<Class<Any>>
     }
 }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.lcb.app.R
 
@@ -37,9 +38,8 @@ class HotSpotAdapter(
             address.text = spot.subtitle
             description.text = spot.description ?: ""
             Glide.with(cover)
-                .load(spot.coverUrl)
-                .centerCrop()
-                .transform(RoundedCorners(cover.resources.displayMetrics.density.times(10).toInt()))
+                .load(spot.coverRes)
+                .transform(CenterCrop(), RoundedCorners(cover.resources.displayMetrics.density.times(10).toInt()))
                 .placeholder(R.drawable.bg_cover_placeholder)
                 .error(R.drawable.bg_cover_placeholder)
                 .into(cover)

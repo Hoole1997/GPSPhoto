@@ -51,11 +51,11 @@ ext {
 
     // 应用版本配置
     app = [applicationId: "com.gpsphoto.locationmap.tool",
-           compileSdk   : 36,
+           compileSdk   : 37,
            minSdk       : 26,
-           targetSdk    : 36,
-           versionCode  : 7,
-           versionName  : "1.0.6"]
+           targetSdk    : 37,
+           versionCode  : 8,
+           versionName  : "1.0.7"]
 
     // 统计归因配置
     analytics = [adjustAppToken: "hopjs50gmuww",           // Adjust App Token

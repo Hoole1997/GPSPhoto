@@ -41,7 +41,7 @@ class StreetViewAdapter(
             panoBadge.visibility = if (spot.isPano) View.VISIBLE else View.GONE
 
             val radius = (10 * thumb.resources.displayMetrics.density).toInt()
-            val imageUrl = spot.thumbUrl ?: spot.coverUrl
+            val imageUrl = spot.thumbUrl
             if (imageUrl != null) {
                 Glide.with(thumb)
                     .load(imageUrl)

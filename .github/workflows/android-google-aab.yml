@@ -32,6 +32,9 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_PACKAGES_USER: ${{ secrets.GH_PACKAGES_USER || github.actor }}
       GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+      # Launcher SDK 和定制依赖通过专用 Maven 仓库获取。
+      APP_PLAT_MAVEN_USER: ${{ secrets.APP_PLAT_MAVEN_USER }}
+      APP_PLAT_MAVEN_PASSWORD: ${{ secrets.APP_PLAT_MAVEN_PASSWORD }}
 
     steps:
       - name: Checkout main

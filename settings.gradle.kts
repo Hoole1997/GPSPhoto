@@ -21,6 +21,12 @@ if (buildConfigFile.exists()) {
 }
 
 dependencyResolutionManagement {
+    val localProperties = java.util.Properties().apply {
+        val localPropertiesFile = rootDir.resolve("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use(::load)
+        }
+    }
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
@@ -43,6 +49,24 @@ dependencyResolutionManagement {
                 password = buildConfig.getProperty("github.token")
                     ?: System.getenv("GH_PACKAGES_TOKEN")
                     ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+        maven {
+            url = uri("https://maven.app-plat.com/repository/maven-public")
+            // 只开放 Launcher SDK 及其定制版 Firebase Config，避免影响其他依赖的解析。
+            content {
+                includeGroup("com.launcher.unity")
+                includeModule("com.google.firebase", "firebase-config")
+            }
+            val repositoryUser = localProperties.getProperty("appPlatMavenUser")
+                ?: System.getenv("APP_PLAT_MAVEN_USER")
+            val repositoryPassword = localProperties.getProperty("appPlatMavenPassword")
+                ?: System.getenv("APP_PLAT_MAVEN_PASSWORD")
+            if (!repositoryUser.isNullOrBlank() && !repositoryPassword.isNullOrBlank()) {
+                credentials {
+                    username = repositoryUser
+                    password = repositoryPassword
+                }
             }
         }
     }

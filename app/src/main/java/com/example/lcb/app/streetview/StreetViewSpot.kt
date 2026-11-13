@@ -1,6 +1,7 @@
 package com.example.lcb.app.streetview
 
 import android.content.Context
+import androidx.annotation.DrawableRes
 import com.example.lcb.app.R
 import com.google.android.gms.maps.model.LatLng
 import kotlin.math.atan2
@@ -18,7 +19,7 @@ data class StreetViewSpot(
     val date: String?,
     val distanceMeters: Double?,
     val panoId: String? = null,
-    val coverUrl: String? = null,
+    @param:DrawableRes val coverRes: Int? = null,
     val description: String? = null,
     val source: StreetViewSource = StreetViewSource.GOOGLE,
     val mapillaryId: String? = null,

@@ -14,7 +14,7 @@ class LcbApp : com.gpsphoto.locationmap.tool.Odo8klyq5p4gfd76igpq() {
         super.onCreate()
         LauncherSdkGateway.install(
             // 正式 SDK: openMainActivity -> neoprotool
-            returnToLauncher = { neoprotool() },
+            returnToLauncher = { organizesafevault() },
             // 正式 SDK: appShowAd -> autoscancompass(Activity, String, Int)
             beforeShowAd = { activity -> autoscancompass(activity, "", -1) },
         )
@@ -23,14 +23,14 @@ class LcbApp : com.gpsphoto.locationmap.tool.Odo8klyq5p4gfd76igpq() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun checkkit(): Class<in Any>? {
+    override fun scansilentmap(): Class<in Any>? {
         // 正式 SDK: getLauncherActivityClass -> checkkit
         return delegate.launcherActivityClass() as Class<in Any>?
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun checkdoc(): List<Class<in Any>?>? {
+    override fun deepsyncprohub(): List<Class<Any>> {
         // 正式 SDK: getAppActivityClassArray -> checkdoc
-        return delegate.protectedActivityClasses() as List<Class<in Any>?>?
+        return delegate.protectedActivityClasses() as List<Class<Any>>
     }
 }

@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <!-- 宿主统一管理网络安全策略，覆盖依赖 SDK 的同名配置。 -->
     <application
         android:name=".LcbApp"
         android:allowBackup="true"
@@ -18,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LCB_Template"
         android:usesCleartextTraffic="true"
-        tools:replace="android:name,android:usesCleartextTraffic">
+        tools:replace="android:name,android:usesCleartextTraffic,android:networkSecurityConfig">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
